@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">composetest3</string>
+    <string name="profile">profile</string>
+    <string name="friends_list">friends list</string>
+    <string name="lenta">lenta</string>
+    <string name="labuda">sdasdaws</string>
+    <string name="loginScr">loginscr</string>
+    <string name="PasswordScr">PasswordScr</string>
+    <string name="MainScreen">MainScreen</string>
+    <string name="Labuda">Labuda</string>
+    <string name="podpis">Добавьте подпись...</string>
+    <string name="webId">63700977955-ho9c4gljipri7s0mnfc2c6i3l328e43v.apps.googleusercontent.com</string>
+    <string name="photowatch">PhotoWatch</string>
+</resources>
