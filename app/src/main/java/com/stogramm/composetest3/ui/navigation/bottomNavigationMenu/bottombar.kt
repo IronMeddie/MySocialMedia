@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.ironmeddie.feature_add_friend.navigation.searchScreenRoute
 import com.stogramm.composetest3.ui.navigation.NotificationNavigationRoute
 import com.stogramm.composetest3.ui.navigation.newsFeedNavigationRoute
 import com.stogramm.composetest3.ui.navigation.userProfileNavigationRoute
@@ -15,7 +16,10 @@ import com.stogramm.composetest3.ui.navigation.userProfileNavigationRoute
 @Composable
 fun bottombar(navController: NavController, click: (st: String) -> Unit) {
     val bottomitems =
-        listOf(newsFeedNavigationRoute, userProfileNavigationRoute, NotificationNavigationRoute)
+        listOf(newsFeedNavigationRoute,
+            userProfileNavigationRoute,
+            NotificationNavigationRoute
+        )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 

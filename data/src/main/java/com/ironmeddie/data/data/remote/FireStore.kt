@@ -24,7 +24,7 @@ class MyFireStore {
     private val currentUser = Firebase.auth.currentUser?.uid
 
 
-    suspend fun addNewUser(userInfo: UserInfo) = db.collection(USERS_NODE).document(currentUser.toString()).set(userInfo).await()
+    suspend fun addNewUser(userInfo: UserInfo) = db.collection(USERS_NODE).document(userInfo.id).set(userInfo).await()
 
     suspend fun getUserbyId(userId: String = currentUser.toString()) = db.collection(USERS_NODE).document(userId).get().await().toObject(UserInfo::class.java)
 
@@ -49,7 +49,6 @@ class MyFireStore {
             is UserInformationUpdate.AddFriend ->{
                 db.collection(USERS_NODE).document(currentUser.toString() + "/friendsList").set(information.friendId)
             }
-
             //todo
             is UserInformationUpdate.ChangeUsername->{
 

@@ -7,9 +7,10 @@ import com.ironmeddie.data.domain.use_case.feature_add_friend.SearchFriendsUseCa
 import com.ironmeddie.data.models.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,11 +28,13 @@ class SearchFriendsViewModel @Inject constructor(
 
     private var job : Job? = null
 
-    fun searchForUser(){
-        if (request.value.isNotEmpty()){
-            job?.cancel()
-            job = viewModelScope.launch {
-                searchFriendsUseCase(_request.value).onEach {
+    fun searchForUser(str: String){
+        if(!str.contains("\n"))_request.value = str
+        job?.cancel()
+        job = viewModelScope.launch {
+            delay(300)
+            if (_request.value.isNotEmpty()){
+                searchFriendsUseCase(_request.value).collectLatest {
                     _resultList.value = it
                 }
             }

@@ -22,6 +22,8 @@ class MyRepositoryImpl @Inject constructor(
     private val firestore: MyFireStore
 ) : MyRepository {
 
+    private var userid = ""
+
     override suspend fun getUser() = articleDao.getUserInfo()
 
     override suspend fun saveUser(user: UserInfo) = articleDao.insert(user)
@@ -39,8 +41,11 @@ class MyRepositoryImpl @Inject constructor(
     override suspend fun registration(user: UserInfo, password: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val id = firebaseAuthApp.registerNew(email = user.email ?: return@launch, password = password)
-            val newUser = user.copy(id = id?: "can't get uid")
-            firestore.addNewUser(newUser)
+            if (id != null){
+                userid = id
+                val newUser = user.copy(id = id)
+                firestore.addNewUser(newUser)
+            }
         }
     }
 

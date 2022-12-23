@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ironmeddie.data.models.Post
+import com.ironmeddie.feature_add_friend.navigation.navigateToSearchScreen
 import com.ironmeddie.feature_new_post.presentation.navigation.navigateToNewPostScreen
 import com.stogramm.composetest3.R
 import com.stogramm.composetest3.ui.utilComposes.LikeButton
@@ -40,6 +42,9 @@ fun NewsFeedScreen(
             Row(modifier = Modifier.padding(end = 16.dp)) {
                 IconButton(onClick = { navController.navigateToNewPostScreen() }) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = "new post")
+                }
+                IconButton(onClick = { navController.navigateToSearchScreen() }) {
+                    Icon(imageVector = Icons.Default.Search, contentDescription = "search")
                 }
             }
         }

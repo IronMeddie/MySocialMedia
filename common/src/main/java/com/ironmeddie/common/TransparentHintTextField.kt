@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
@@ -20,14 +21,19 @@ fun TransparentHintTextField(
     onValueChange: (String) -> Unit,
     textStyle: TextStyle = TextStyle(),
     singleLine: Boolean = false,
+    hintAlign: Alignment = Alignment.TopStart,
+    bodyAlign: Alignment = Alignment.TopStart,
+    maxLnes : Int = 20,
     onFocusChange: (FocusState)-> Unit
 ) {
     Box(modifier = modifier) {
-        BasicTextField(value = text, onValueChange = onValueChange, singleLine = singleLine, textStyle = textStyle, modifier = Modifier
+        BasicTextField(value = text, onValueChange = onValueChange, singleLine = singleLine, textStyle = textStyle, maxLines = maxLnes, modifier = Modifier
             .matchParentSize()
-            .onFocusChanged { onFocusChange(it) })
+            .onFocusChanged { onFocusChange(it) }
+            .align(bodyAlign)
+        )
         if (isHintVisible){
-            Text(text = hint, style = textStyle, color = Color.DarkGray)
+            Text(text = hint, style = textStyle, color = Color.DarkGray, modifier = Modifier.align(hintAlign))
         }
 
     }

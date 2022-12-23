@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.ironmeddie.feature_new_post'
+    namespace 'com.ironmeddie.feature_add_friend'
     compileSdk 33
 
     defaultConfig {

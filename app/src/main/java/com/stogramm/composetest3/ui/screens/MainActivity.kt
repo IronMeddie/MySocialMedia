@@ -23,6 +23,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.get
 import com.ironmeddie.data.data.utils.Const
+import com.ironmeddie.feature_add_friend.navigation.searchFriendsScreen
 import com.ironmeddie.feature_new_post.presentation.navigation.newPostScreen
 import com.stogramm.composetest3.context
 import com.stogramm.composetest3.ui.navigation.*
@@ -90,7 +91,7 @@ fun MainNavHost(views: ListVM = hiltViewModel()) {
 
 
                 // loginstate can be a mark, that all is good. We can make it true only after download few posts for example or after updating user information from server
-
+//todo
                 if (views.loginState == false) {
                     navController.navigateToLoginScreen()
                 }else if (views.loginState == null){
@@ -102,13 +103,9 @@ fun MainNavHost(views: ListVM = hiltViewModel()) {
                 startDestination = mainScreenNavigationRoute,
                 Modifier.padding(innerPadding)
             ) {
-
-
                 loginScreen(navController = navController,
                     onRegistrationComplete = {
                         navController.navigateToMainScreen(
-//                            NavOptions.Builder().setPopUpTo(navController.graph.findStartDestination().id,true, saveState = true).setLaunchSingleTop(true).build()  //this is wrong
-
                             NavOptions.Builder().setLaunchSingleTop(true).setPopUpTo(navController.graph.id,true).build()
                         )
                     })
@@ -131,16 +128,13 @@ fun MainNavHost(views: ListVM = hiltViewModel()) {
                 }
                 newPostScreen(navController)
                 Splash()
-
+                searchFriendsScreen()
 
             }
-
-
 
         }
 
     }
-
 
 }
 

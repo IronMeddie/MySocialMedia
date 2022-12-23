@@ -15,11 +15,7 @@ class FirebaseAuthApp {
     suspend fun signIn(email: String, password: String) =
         auth.signInWithEmailAndPassword(email, password).await()
 
-
     suspend fun registerNew(email: String, password: String) = auth.createUserWithEmailAndPassword(email, password).await().user?.uid
-
-
-
 
     fun signOut() {
         Firebase.auth.signOut()

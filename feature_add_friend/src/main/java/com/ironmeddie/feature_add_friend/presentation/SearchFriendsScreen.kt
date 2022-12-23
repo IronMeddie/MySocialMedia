@@ -1,5 +1,6 @@
 package com.ironmeddie.feature_add_friend.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,35 +25,63 @@ import com.ironmeddie.data.models.UserInfo
 
 @Composable
 fun SearchFriendsScreen(viewModel : SearchFriendsViewModel = hiltViewModel()) {
-    val list = viewModel.resultList.collectAsState().value.toMutableStateList()
-    Scaffold(topBar = {
+    val list = viewModel.resultList.collectAsState().value
+    val request = viewModel.request.collectAsState().value
 
+    Scaffold(topBar = {
+        SearchBar(request){
+            viewModel.searchForUser(it)
+        }
     }) {
         LazyColumn(modifier = Modifier
             .fillMaxSize()
             .padding(it)){
-            items(list){ userinfo->
-                SearchFriendListItem(userinfo){
-                    viewModel.addFriend(userinfo.id)
+            if (list.isNotEmpty()){
+                items(list){ userinfo->
+                    SearchFriendListItem(userinfo){
+                        viewModel.addFriend(userinfo.id)
+                    }
                 }
             }
+            else{
+                item {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(300.dp)) {
+                        Text(text = "search", modifier = Modifier.align(Alignment.Center))
+                    }
+                }
+            }
+
         }
     }
-
 }
 
 @Composable
 private fun SearchBar(value: String, onValueChanged : (String) -> Unit){
 
-    var value1 by remember { mutableStateOf("") }
+
 
     Box(modifier = Modifier
         .fillMaxWidth()
-        .height(50.dp)) {
-        TransparentHintTextField(text = value1, hint = "" , onValueChange = {value1 = it}, onFocusChange = {  }
+        .height(50.dp)
+        .background(Color.Blue)) {
+        TransparentHintTextField(text = value,
+            hint = "search" ,
+            onValueChange = {str-> onValueChanged(str) },
+            onFocusChange = {  },
+            isHintVisible = value.isBlank()
         , modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp))
+                .padding(horizontal = 16.dp)
+                .background(Color.White)
+                .padding(vertical = 8.dp),
+            singleLine = true,
+            textStyle = MaterialTheme.typography.h6,
+            hintAlign = Alignment.CenterStart,
+            bodyAlign = Alignment.Center,
+        )
     }
 }
 
