@@ -1,5 +1,6 @@
 package com.ironmeddie.data.data.remote
 
+import android.util.Log
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
@@ -8,9 +9,12 @@ import com.ironmeddie.data.data.remote.utils.PostDTO
 import com.ironmeddie.data.data.remote.utils.PostNodes
 import com.ironmeddie.data.data.remote.utils.UserNodes
 import com.ironmeddie.data.models.UserInfo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 const val USERS_NODE = "users"
@@ -84,8 +88,14 @@ class MyFireStore {
         }
 
     suspend fun addFriend(id: String) {
-        db.collection(USERS_NODE).document((currentUser ?:return )+ "/" + UserNodes.friendsList).set(id).await()
-        db.collection(USERS_NODE).document(id+ "/" + UserNodes.friendRequests).set(currentUser).await()
+        db.collection("friendsList").add(hashMapOf<String,Any>(currentUser!! to id)).await()
+        Log.d("checkCode", "friend added")
+        CoroutineScope(Dispatchers.IO).launch {
+//            db.collection(USERS_NODE).document((currentUser!!)+ "/" + UserNodes.friendsList).set(id).await()
+//            db.collection(USERS_NODE).document(id+ "/" + UserNodes.friendRequests).set(currentUser).await()
+
+        }
+
     }
 }
 
