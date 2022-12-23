@@ -7,6 +7,7 @@ import com.google.firebase.ktx.Firebase
 import com.ironmeddie.data.data.remote.FirebaseAuthApp
 import com.ironmeddie.data.data.remote.FirebaseStorageApp
 import com.ironmeddie.data.data.remote.MyFireStore
+import com.ironmeddie.data.domain.repository.MyRepository
 import com.ironmeddie.data.models.UserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,28 +15,28 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class MyRepository @Inject constructor(
+class MyRepositoryImpl @Inject constructor(
     private val articleDao: UserDao,
     private val firebaseAuthApp: FirebaseAuthApp,
     private val storage: FirebaseStorageApp,
     private val firestore: MyFireStore
-) {
+) : MyRepository {
 
-    suspend fun getUser() = articleDao.getUserInfo()
+    override suspend fun getUser() = articleDao.getUserInfo()
 
-    suspend fun saveUser(user: UserInfo) = articleDao.insert(user)
+    override suspend fun saveUser(user: UserInfo) = articleDao.insert(user)
 
-    suspend fun deleteUserFromLocal(user: UserInfo) = articleDao.delete(user)
+    override suspend fun deleteUserFromLocal(user: UserInfo) = articleDao.delete(user)
 
-    suspend fun signIn(email: String, password: String) {
+    override suspend fun signIn(email: String, password: String) {
         firebaseAuthApp.signIn(email = email, password = password)
     }
 
-    fun logOut() {
+    override fun logOut() {
         firebaseAuthApp.signOut()
     }
 
-    suspend fun registration(user: UserInfo, password: String) {
+    override suspend fun registration(user: UserInfo, password: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val id = firebaseAuthApp.registerNew(email = user.email ?: return@launch, password = password)
             val newUser = user.copy(id = id?: "can't get uid")
@@ -43,7 +44,7 @@ class MyRepository @Inject constructor(
         }
     }
 
-   suspend fun newPost(fileUri: Uri, description: String){
+    override suspend fun newPost(fileUri: Uri, description: String){
        CoroutineScope(Dispatchers.IO).launch {
            val postId = firestore.newPost(description)
            storage.setFileToStorage(fileUri, FirebaseStorageApp.FileType.PostMedia, postId).collectLatest {
@@ -52,14 +53,18 @@ class MyRepository @Inject constructor(
        }
    }
 
-    fun getUserId() = Firebase.auth.currentUser?.uid
+    override fun getUserId() = Firebase.auth.currentUser?.uid
 
-    fun getUserFriendList() : List<String> = emptyList() // todo get user friends
-
-
-    suspend fun getUserInformation() = firestore.getUserbyId()
-
-    suspend fun getPosts(authorsList: List<String>) = firestore.getPosts(authorsList)
+    override fun getUserFriendList() : List<String> = emptyList() // todo get user friends
 
 
+    override suspend fun getUserInformation() = firestore.getUserbyId()
+
+    override suspend fun getPosts(authorsList: List<String>) = firestore.getPosts(authorsList)
+
+    override suspend fun getUsersByValue(str:String) = firestore.getUsersListByValue(str)
+
+    override suspend fun addFriend(id: String) {
+        firestore.addFriend(id)
+    }
 }

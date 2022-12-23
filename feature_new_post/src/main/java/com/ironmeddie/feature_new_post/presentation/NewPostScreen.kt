@@ -1,6 +1,5 @@
 package com.ironmeddie.feature_new_post.presentation
 
-import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -15,17 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.ironmeddie.feature_new_post.TransparentHintTextField
-import dagger.hilt.android.qualifiers.ApplicationContext
-import id.zelory.compressor.Compressor
-import id.zelory.compressor.constraint.size
+import com.ironmeddie.common.TransparentHintTextField
+import com.ironmeddie.feature_new_post.presentation.util.compressUri
 import kotlinx.coroutines.launch
-import java.io.File
-import java.net.URI
 
 
 @Composable
@@ -44,13 +38,7 @@ fun NewPostScreen(
         rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia(),
             onResult = { uri ->
                 scope.launch {
-                    selectedImageUri = uri
-                    //todo compress photo before upload
-//                    val path = URI(uri?.getPath()!!)
-//                    val file = File(path)
-//                    selectedImageUri = Compressor.compress(context, file) {
-//                        size(1_048_576)
-//                    }.toUri()
+                   selectedImageUri = compressUri(uri,context)
                 }
             })
 
@@ -130,4 +118,6 @@ fun NewPostScreen(
 
 
 }
+
+
 

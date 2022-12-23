@@ -5,7 +5,7 @@ import androidx.compose.ui.focus.FocusState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ironmeddie.feature_new_post.domain.use_case.PostNewPhotoUseCase
-import com.ironmeddie.feature_new_post.presentation.components.PostTextFieldState
+import com.ironmeddie.common.TextFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +15,12 @@ import javax.inject.Inject
 @HiltViewModel
 class NewPostViewModel @Inject constructor(private val newPhotoUseCase: PostNewPhotoUseCase) : ViewModel() {
 
-    private val _description = MutableStateFlow(PostTextFieldState(text = "", hint = "Enter post description..."))
+    private val _description = MutableStateFlow(
+        com.ironmeddie.common.TextFieldState(
+            text = "",
+            hint = "Enter post description..."
+        )
+    )
     val description = _description.asStateFlow()
 
 

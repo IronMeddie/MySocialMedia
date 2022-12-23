@@ -7,10 +7,12 @@ import com.example.test1.data.db.UserDB
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.ironmeddie.data.data.remote.FireBaseDb
+import com.google.firebase.storage.FirebaseStorage
 import com.ironmeddie.data.data.remote.FirebaseAuthApp
 import com.ironmeddie.data.data.remote.FirebaseStorageApp
 import com.ironmeddie.data.data.remote.MyFireStore
+import com.ironmeddie.data.data.repository.MyRepositoryImpl
+import com.ironmeddie.data.domain.repository.MyRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,14 +26,6 @@ object AppModule {
 
 
     @Provides
-    @Singleton
-    fun provideFirebase(): FirebaseDatabase = Firebase.database
-
-    @Provides
-    fun provideDB(): FireBaseDb = FireBaseDb()
-
-
-    @Provides
     fun firebaseStorage(): FirebaseStorageApp = FirebaseStorageApp()
 
     @Provides
@@ -39,6 +33,10 @@ object AppModule {
 
     @Provides
     fun provideFireStore() : MyFireStore = MyFireStore()
+
+    @Provides
+    @Singleton
+    fun providerepository(userDao: UserDao, firebaseAuth: FirebaseAuthApp,storage: FirebaseStorageApp, fireStore: MyFireStore ) : MyRepository = MyRepositoryImpl(userDao,firebaseAuth,storage,fireStore)
 
     @Provides
     @Singleton

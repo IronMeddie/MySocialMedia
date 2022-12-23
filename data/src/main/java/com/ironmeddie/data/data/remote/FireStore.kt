@@ -8,6 +8,9 @@ import com.ironmeddie.data.data.remote.utils.PostDTO
 import com.ironmeddie.data.data.remote.utils.PostNodes
 import com.ironmeddie.data.data.remote.utils.UserNodes
 import com.ironmeddie.data.models.UserInfo
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.tasks.await
 
 const val USERS_NODE = "users"
@@ -46,12 +49,50 @@ class MyFireStore {
             is UserInformationUpdate.AddFriend ->{
                 db.collection(USERS_NODE).document(currentUser.toString() + "/friendsList").set(information.friendId)
             }
+
+            //todo
             is UserInformationUpdate.ChangeUsername->{
 
             }
         }
     }
 
+    suspend fun checkAlreadyUsed(value: UnicValue): Boolean{
+        // проверяем есть ли уже в базе такие значения. Не уверен, что авсе будет работать правильно нужно протестить
+      return  when(value){
+            is UnicValue.Username -> db.collection(USERS_NODE).whereEqualTo(UserNodes.username,value.username).get().await().isEmpty
+            is UnicValue.Email -> db.collection(USERS_NODE).whereEqualTo(UserNodes.email,value.email).get().await().isEmpty
+        }
+    }
+
+    suspend fun getUsersListByValue(str: String): Flow<List<UserInfo>> =
+        flow{
+            val list = mutableListOf<UserInfo>()
+            emit(list)
+            list.addAll(db.collection(USERS_NODE).whereEqualTo(UserNodes.email,str).get().await().toObjects(UserInfo::class.java))
+            emit(list)
+            list.addAll(db.collection(USERS_NODE).whereEqualTo(UserNodes.username,str).get().await().toObjects(UserInfo::class.java))
+            emit(list)
+            list.addAll(db.collection(USERS_NODE).whereEqualTo(UserNodes.secondname,str).get().await().toObjects(UserInfo::class.java))
+            emit(list)
+            list.addAll(db.collection(USERS_NODE).whereEqualTo(UserNodes.firstname,str).get().await().toObjects(UserInfo::class.java))
+            emit(list)
+            if (str.contains(" ")){
+                list.addAll(db.collection(USERS_NODE).whereEqualTo(UserNodes.firstname, str.substringBefore(" ")).whereEqualTo(UserNodes.secondname,str.substringAfter(" ")).get().await().toObjects(UserInfo::class.java))
+                list.addAll(db.collection(USERS_NODE).whereEqualTo(UserNodes.secondname, str.substringBefore(" ")).whereEqualTo(UserNodes.firstname,str.substringAfter(" ")).get().await().toObjects(UserInfo::class.java))
+                emit(list)
+            }
+        }
+
+    suspend fun addFriend(id: String) {
+        db.collection(USERS_NODE).document((currentUser ?:return )+ "/" + UserNodes.friendsList).set(id).await()
+        db.collection(USERS_NODE).document(id+ "/" + UserNodes.friendRequests).set(currentUser).await()
+    }
+}
+
+sealed class UnicValue{
+    data class Username(val username: String): UnicValue()
+    data class Email(val email :String): UnicValue()
 }
 
 sealed class UserInformationUpdate(information: String){

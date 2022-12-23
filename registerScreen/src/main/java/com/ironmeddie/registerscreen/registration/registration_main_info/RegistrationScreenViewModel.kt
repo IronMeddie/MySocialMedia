@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ironmeddie.data.data.repository.MyRepository
+import com.ironmeddie.data.data.repository.MyRepositoryImpl
 import com.ironmeddie.data.models.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegistrationScreenViewModel @Inject constructor(
-    private val repository: MyRepository
+    private val repository: MyRepositoryImpl
     ) : ViewModel() {
     var username by mutableStateOf("")
         private set

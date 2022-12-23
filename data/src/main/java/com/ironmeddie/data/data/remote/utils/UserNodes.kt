@@ -10,4 +10,5 @@ object UserNodes{
     const val sex  = "sex"
     const val posts  = "posts"
     const val friendsList = "friendsList"
+    const val friendRequests = "friendRequests"
 }

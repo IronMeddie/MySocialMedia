@@ -1,6 +1,7 @@
 package com.ironmeddie.domain.usecases
 
-import com.ironmeddie.data.data.repository.MyRepository
+import com.ironmeddie.data.data.repository.MyRepositoryImpl
+import com.ironmeddie.data.domain.repository.MyRepository
 import javax.inject.Inject
 
 class SignInUseCase @Inject constructor(private val repository: MyRepository) {

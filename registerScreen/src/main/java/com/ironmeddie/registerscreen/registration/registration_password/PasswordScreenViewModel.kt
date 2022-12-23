@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ironmeddie.data.data.repository.MyRepository
+import com.ironmeddie.data.data.repository.MyRepositoryImpl
 import com.ironmeddie.domain.usecases.InvalidUserExeption
 import com.ironmeddie.domain.usecases.RegisterNewUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PasswordScreenViewModel @Inject constructor(
     private val registerNewUserUseCase: RegisterNewUserUseCase,
-    private val repository: MyRepository
+    private val repository: MyRepositoryImpl
 ) : ViewModel() {
     var password by mutableStateOf("")
         private set

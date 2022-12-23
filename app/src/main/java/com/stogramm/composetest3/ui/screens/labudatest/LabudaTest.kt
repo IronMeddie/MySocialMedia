@@ -29,6 +29,7 @@ fun LabudaTest(){
                 .padding(5.dp)
                 , 4){
                 for (i in 1 .. 5){
+
                     Box(
                         Modifier
                             .width(30.dp)
