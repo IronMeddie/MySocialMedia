@@ -9,7 +9,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,7 +26,8 @@ import com.ironmeddie.data.models.UserInfo
 
 @Composable
 fun SearchFriendsScreen(viewModel : SearchFriendsViewModel = hiltViewModel()) {
-    val list = viewModel.resultList.collectAsState().value
+
+    val state = viewModel.resultList
     val request = viewModel.request.collectAsState().value
 
     Scaffold(topBar = {
@@ -33,28 +35,42 @@ fun SearchFriendsScreen(viewModel : SearchFriendsViewModel = hiltViewModel()) {
             viewModel.searchForUser(it)
         }
     }) {
-        LazyColumn(modifier = Modifier
-            .fillMaxSize()
-            .padding(it)){
-            if (list.isNotEmpty()){
-                items(list){ userinfo->
-                    SearchFriendListItem(userinfo){
-                        viewModel.addFriend(userinfo.id)
-                    }
-                }
-            }
-            else{
-                item {
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(300.dp)) {
-                        Text(text = "search", modifier = Modifier.align(Alignment.Center))
-                    }
-                }
-            }
 
+        when(state){
+            is SearchScreenState.NoWork -> {
+                Box(
+                    Modifier
+                        .fillMaxSize().padding(40.dp)) {
+                    Text(text = "search", modifier = Modifier.align(Alignment.TopCenter))
+                }
+            }
+            is SearchScreenState.Loading -> {
+                Box(
+                    Modifier
+                        .fillMaxSize().padding(40.dp)) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.TopCenter))
+                }
+            }
+            is SearchScreenState.Success->{
+                LazyColumn(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)){
+                    items(state.list){ userinfo->
+                        SearchFriendListItem(userinfo){
+                            viewModel.addFriend(userinfo.id)
+                        }
+                    }
+                }
+            }
+            is SearchScreenState.Error ->{
+                Box(
+                    Modifier
+                        .fillMaxSize()) {
+                    Text(text = "Cant get data", modifier = Modifier.align(Alignment.TopCenter), style = MaterialTheme.typography.h6)
+                }
+            }
         }
+
     }
 }
 

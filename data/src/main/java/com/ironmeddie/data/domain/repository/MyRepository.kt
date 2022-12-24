@@ -29,7 +29,7 @@ interface MyRepository {
 
     suspend fun getPosts(authorsList: List<String>) : List<Post>
 
-    suspend fun getUsersByValue(str:String) : Flow<List<UserInfo>>
+    fun getUsersByValue(str:String) : Flow<List<UserInfo>>
 
     suspend fun addFriend(id: String)
 

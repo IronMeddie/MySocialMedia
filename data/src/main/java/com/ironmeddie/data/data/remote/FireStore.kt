@@ -13,98 +13,121 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 const val USERS_NODE = "users"
 const val POSTS_NODE = "posts"
-
+const val FRIENDS_NODE = "friendsList"
 
 
 class MyFireStore {
 
     val db = Firebase.firestore
-    private val currentUser = Firebase.auth.currentUser?.uid
+
+    suspend fun addNewUser(userInfo: UserInfo) {
+        val currentUser = userInfo.id
+        CoroutineScope(Dispatchers.IO).launch {
+            db.collection(USERS_NODE).document(userInfo.id).set(userInfo).await()
+            db.collection(FRIENDS_NODE).document((currentUser)).set(hashMapOf(
+                "Friends" to emptyList<String>(),
+                "Query" to emptyList()
+            )).await()
+        }
+
+    }
 
 
-    suspend fun addNewUser(userInfo: UserInfo) = db.collection(USERS_NODE).document(userInfo.id).set(userInfo).await()
+    suspend fun getUserbyId(userId: String = Firebase.auth.currentUser?.uid.toString()
+    ) =
+        db.collection(USERS_NODE).document(userId).get().await().toObject(UserInfo::class.java)
 
-    suspend fun getUserbyId(userId: String = currentUser.toString()) = db.collection(USERS_NODE).document(userId).get().await().toObject(UserInfo::class.java)
+    suspend fun newPost(description: String) = db.collection(POSTS_NODE).add(
+        hashMapOf(
+            PostNodes.descr to description,
+            PostNodes.timeStamp to FieldValue.serverTimestamp(),
+            PostNodes.author to  Firebase.auth.currentUser?.uid
 
-    suspend fun newPost(description: String) = db.collection(POSTS_NODE).add(hashMapOf(
-        PostNodes.descr to description,
-        PostNodes.timeStamp to FieldValue.serverTimestamp(),
-        PostNodes.author to currentUser
-    )).await().id
+    )
+    ).await().id
 
 
-    suspend fun getPosts(authorsId : List<String>) = db.collection(POSTS_NODE).whereIn(PostNodes.author,authorsId).get().await().toObjects(
-        PostDTO::class.java).map { it.toPost() }
+    suspend fun getPosts(authorsId: List<String>) =
+        db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().toObjects(
+            PostDTO::class.java
+        ).map { it.toPost() }
 
     suspend fun deletePost(id: String) = db.collection("posts").document(id).delete().await()
 
     suspend fun updatePostLink(url: String, postId: String) {
-        db.collection(POSTS_NODE).document(postId).update(PostNodes.fileUrl,url).await()
+        db.collection(POSTS_NODE).document(postId).update(PostNodes.fileUrl, url).await()
     }
 
-    suspend fun updateUserInformation(information: UserInformationUpdate){
-        when(information){
-            is UserInformationUpdate.AddFriend ->{
-                db.collection(USERS_NODE).document(currentUser.toString() + "/friendsList").set(information.friendId)
+    suspend fun updateUserInformation(information: UserInformationUpdate) {
+        val currentUser = Firebase.auth.currentUser?.uid
+        when (information) {
+            is UserInformationUpdate.AddFriend -> {
+                db.collection(USERS_NODE).document(currentUser.toString() + "/friendsList")
+                    .set(information.friendId)
             }
             //todo
-            is UserInformationUpdate.ChangeUsername->{
+            is UserInformationUpdate.ChangeUsername -> {
 
             }
         }
     }
 
-    suspend fun checkAlreadyUsed(value: UnicValue): Boolean{
+    suspend fun checkAlreadyUsed(value: UnicValue): Boolean {
         // проверяем есть ли уже в базе такие значения. Не уверен, что авсе будет работать правильно нужно протестить
-      return  when(value){
-            is UnicValue.Username -> db.collection(USERS_NODE).whereEqualTo(UserNodes.username,value.username).get().await().isEmpty
-            is UnicValue.Email -> db.collection(USERS_NODE).whereEqualTo(UserNodes.email,value.email).get().await().isEmpty
+        return when (value) {
+            is UnicValue.Username -> db.collection(USERS_NODE)
+                .whereEqualTo(UserNodes.username, value.username).get().await().isEmpty
+            is UnicValue.Email -> db.collection(USERS_NODE)
+                .whereEqualTo(UserNodes.email, value.email).get().await().isEmpty
         }
     }
 
-    suspend fun getUsersListByValue(str: String): Flow<List<UserInfo>> =
-        flow{
+    fun getUsersListByValue(str: String): Flow<List<UserInfo>> =
+        flow {
             val list = mutableListOf<UserInfo>()
+            list.addAll(
+                db.collection(USERS_NODE)
+                    .whereIn(UserNodes.username, listOf(str))
+                    .get().await().toObjects(UserInfo::class.java)
+            )
+//            list.addAll(db.collection(USERS_NODE).whereIn(UserNodes.firstname, listOf(str)).get().await().toObjects(UserInfo::class.java))
+//            list.addAll(db.collection(USERS_NODE).whereIn(UserNodes.secondname, listOf(str)).get().await().toObjects(UserInfo::class.java))
+//            list.addAll(db.collection(USERS_NODE).whereIn(UserNodes.email, listOf(str)).get().await().toObjects(UserInfo::class.java))
+//            if (str.contains(" ")){
+//                val firs = db.collection(USERS_NODE).whereEqualTo(UserNodes.firstname, str.substringBefore(" ")).whereEqualTo(UserNodes.secondname,str.substringAfter(" ")).get().await().toObjects(UserInfo::class.java)
+//                val sec = db.collection(USERS_NODE).whereEqualTo(UserNodes.secondname, str.substringBefore(" ")).whereEqualTo(UserNodes.firstname,str.substringAfter(" ")).get().await().toObjects(UserInfo::class.java)
+//                list.addAll(firs)
+//                list.addAll(sec)
+//            }
+            Log.d("checkCode", list.size.toString())
             emit(list)
-            list.addAll(db.collection(USERS_NODE).whereEqualTo(UserNodes.email,str).get().await().toObjects(UserInfo::class.java))
-            emit(list)
-            list.addAll(db.collection(USERS_NODE).whereEqualTo(UserNodes.username,str).get().await().toObjects(UserInfo::class.java))
-            emit(list)
-            list.addAll(db.collection(USERS_NODE).whereEqualTo(UserNodes.secondname,str).get().await().toObjects(UserInfo::class.java))
-            emit(list)
-            list.addAll(db.collection(USERS_NODE).whereEqualTo(UserNodes.firstname,str).get().await().toObjects(UserInfo::class.java))
-            emit(list)
-            if (str.contains(" ")){
-                list.addAll(db.collection(USERS_NODE).whereEqualTo(UserNodes.firstname, str.substringBefore(" ")).whereEqualTo(UserNodes.secondname,str.substringAfter(" ")).get().await().toObjects(UserInfo::class.java))
-                list.addAll(db.collection(USERS_NODE).whereEqualTo(UserNodes.secondname, str.substringBefore(" ")).whereEqualTo(UserNodes.firstname,str.substringAfter(" ")).get().await().toObjects(UserInfo::class.java))
-                emit(list)
-            }
         }
 
-    suspend fun addFriend(id: String) {
-        db.collection("friendsList").add(hashMapOf<String,Any>(currentUser!! to id)).await()
-        Log.d("checkCode", "friend added")
-        CoroutineScope(Dispatchers.IO).launch {
-//            db.collection(USERS_NODE).document((currentUser!!)+ "/" + UserNodes.friendsList).set(id).await()
-//            db.collection(USERS_NODE).document(id+ "/" + UserNodes.friendRequests).set(currentUser).await()
-
-        }
-
+    suspend fun queryFriend(id: String) {
+        db.collection(FRIENDS_NODE).document((Firebase.auth.currentUser?.uid ?: "current user is null")).update("Friends", FieldValue.arrayUnion(id)).await()
+        db.collection(FRIENDS_NODE).document((id)).update("Query", FieldValue.arrayUnion(Firebase.auth.currentUser?.uid)).await()
     }
+
+    suspend fun agreeToFriend(id: String){
+        val currentUser = Firebase.auth.currentUser?.uid
+//        db.collection("friendsList").document((currentUser ?: return)).update("Friends", FieldValue.arrayUnion(id)).await()
+        db.collection(FRIENDS_NODE).document((id)).update("Query", FieldValue.arrayRemove(currentUser)).await()
+    }
+
+
 }
 
-sealed class UnicValue{
-    data class Username(val username: String): UnicValue()
-    data class Email(val email :String): UnicValue()
+sealed class UnicValue {
+    data class Username(val username: String) : UnicValue()
+    data class Email(val email: String) : UnicValue()
 }
 
-sealed class UserInformationUpdate(information: String){
+sealed class UserInformationUpdate(information: String) {
     data class AddFriend(val friendId: String) : UserInformationUpdate(friendId)
     data class ChangeUsername(val username: String) : UserInformationUpdate(username)
 }

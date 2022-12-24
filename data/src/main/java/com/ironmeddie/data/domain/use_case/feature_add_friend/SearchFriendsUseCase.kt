@@ -5,5 +5,5 @@ import javax.inject.Inject
 
 class SearchFriendsUseCase @Inject constructor(private val repository: MyRepository) {
 
-    suspend operator fun invoke(string: String) = repository.getUsersByValue(string)
+    operator fun invoke(string: String) = repository.getUsersByValue(string)
 }

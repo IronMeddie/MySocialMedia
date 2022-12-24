@@ -67,9 +67,9 @@ class MyRepositoryImpl @Inject constructor(
 
     override suspend fun getPosts(authorsList: List<String>) = firestore.getPosts(authorsList)
 
-    override suspend fun getUsersByValue(str:String) = firestore.getUsersListByValue(str)
+    override fun getUsersByValue(str:String) = firestore.getUsersListByValue(str)
 
     override suspend fun addFriend(id: String) {
-        firestore.addFriend(id)
+        firestore.queryFriend(id)
     }
 }
