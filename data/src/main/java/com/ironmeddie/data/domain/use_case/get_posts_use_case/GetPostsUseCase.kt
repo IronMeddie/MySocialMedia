@@ -1,4 +1,4 @@
-package com.ironmeddie.data.domain.use_case
+package com.ironmeddie.data.domain.use_case.get_posts_use_case
 
 import android.util.Log
 import com.ironmeddie.data.domain.repository.MyRepository
@@ -15,6 +15,5 @@ class GetPostsUseCase @Inject constructor(private val repository: MyRepository) 
                 repository.getPosts(list).map { listPosts->
                     listPosts.sortedBy { it.timeStamp }
                 }
-
         }
 }

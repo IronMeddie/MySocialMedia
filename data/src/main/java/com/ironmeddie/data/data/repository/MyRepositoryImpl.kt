@@ -6,6 +6,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ironmeddie.data.data.remote.*
 import com.ironmeddie.data.domain.repository.MyRepository
+import com.ironmeddie.data.models.Post
 import com.ironmeddie.data.models.UserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -76,4 +77,6 @@ class MyRepositoryImpl @Inject constructor(
     override suspend fun agreeToFriend(id: String) {
         firestore.agreeToFriend(id)
     }
+
+    override fun getPostById(id: String): Flow<Post> = firestore.getPostById(id)
 }

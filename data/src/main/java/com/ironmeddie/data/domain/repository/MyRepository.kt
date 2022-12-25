@@ -39,4 +39,6 @@ interface MyRepository {
 
     suspend fun agreeToFriend(id: String)
 
+    fun getPostById(id: String): Flow<Post>
+
 }

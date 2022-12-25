@@ -1,5 +1,6 @@
 package com.stogramm.composetest3.ui.screens.ItemDetails
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -52,6 +53,7 @@ fun LentaItemWatch(newsID : String?, vs: ListVM,navController: NavController, li
 
 @Composable
 private fun Body(wellnessTask: Post, navController: NavController) {
+    Log.d("checkCode", wellnessTask.fileUrl)
     Column(modifier = Modifier.padding(7.dp)) {
         Text(
             text = wellnessTask.descr
@@ -63,7 +65,7 @@ private fun Body(wellnessTask: Post, navController: NavController) {
                 .defaultMinSize(minHeight = 100.dp)
                 .fillMaxWidth()
                 .animateContentSize()
-                .clickable { navController.navigate(photoViewerRoute) },
+                .clickable { navController.navigate(photoViewerRoute + "?id=${wellnessTask.id}") },
             contentScale = ContentScale.FillWidth
         )
         Row(verticalAlignment = Alignment.CenterVertically) {

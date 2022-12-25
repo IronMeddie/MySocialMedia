@@ -17,11 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavOptions
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.get
+import androidx.navigation.navArgument
 import com.ironmeddie.data.data.utils.Const
 import com.ironmeddie.feature_add_friend.navigation.searchFriendsScreen
 import com.ironmeddie.feature_new_post.presentation.navigation.newPostScreen
@@ -116,12 +118,11 @@ fun MainNavHost(views: ListVM = hiltViewModel()) {
                         navController,
                         liked = { views.liked(it) })
                 }
-                composable(photoViewerRoute) { backStackEntry ->
-                    PhotoWatch(
-                        backStackEntry.arguments?.getString(
-                            Const.PhotoURL
-                        )
-                    )
+                composable(photoViewerRoute + "?id={id}", arguments =  listOf(
+                    navArgument(name = "id"){
+                        type = NavType.StringType
+                        defaultValue = "-1" })) {
+                    PhotoWatch()
                 }
                 mainScreen(views, navController) {
                     navController.navigate(ItemViewerScreenRoute + "/${it}")

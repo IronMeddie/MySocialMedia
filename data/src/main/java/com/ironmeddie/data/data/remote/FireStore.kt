@@ -1,16 +1,12 @@
 package com.ironmeddie.data.data.remote
 
 import android.util.Log
-import com.google.android.gms.tasks.Tasks.await
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.ironmeddie.data.data.remote.MyNotification.Companion.EVENT_FRIEND_REQUEST
-import com.ironmeddie.data.data.remote.utils.PostDTO
 import com.ironmeddie.data.data.remote.utils.PostNodes
 import com.ironmeddie.data.data.remote.utils.UserNodes
 import com.ironmeddie.data.models.Post
@@ -63,17 +59,17 @@ class MyFireStore {
     }
 
 
-    fun getPosts(authorsId: List<String>) = flow{
+    fun getPosts(authorsId: List<String>) = flow {
         val list =
-        db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().map {
-            Post(
-                id = it.id,
-                author = it.data["author"].toString(),
-                timeStamp = (it.data["timeStamp"] as Timestamp).toDate().toString(),
-                descr = it.data["descr"].toString(),
-                fileUrl = it.data["fileUrl"].toString()
-            )
-        }
+            db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().map {
+                Post(
+                    id = it.id,
+                    author = it.data["author"].toString(),
+                    timeStamp = (it.data["timeStamp"] as Timestamp).toDate().toString(),
+                    descr = it.data["descr"].toString(),
+                    fileUrl = it.data["fileUrl"].toString()
+                )
+            }
 //        db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().toObjects(PostDTO::class.java).map { it.toPost() }
         emit(list)
     }
@@ -146,11 +142,11 @@ class MyFireStore {
 //        ))
         db.collection(NOTIFI_NODE).add(
             hashMapOf(
-                 "recieverId" to id,
-             "event" to EVENT_FRIEND_REQUEST,
-         "authorID" to currentUser,
-         "timeStamp" to FieldValue.serverTimestamp(),
-         "isViewed" to false
+                "recieverId" to id,
+                "event" to EVENT_FRIEND_REQUEST,
+                "authorID" to currentUser,
+                "timeStamp" to FieldValue.serverTimestamp(),
+                "isViewed" to false
             )
         )
     }
@@ -167,24 +163,50 @@ class MyFireStore {
 
     @Throws(NoAuthExeption::class)
     fun getNotifications(): Flow<List<MyNotification>> { // or get friendsList
-        val currentUser = Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("getNotifications failure")
+        val currentUser =
+            Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("getNotifications failure")
         return flow {
-            emit(db.collection(NOTIFI_NODE).whereEqualTo("recieverId",currentUser).get().await().toObjects(MyNotification::class.java))
+            emit(
+                db.collection(NOTIFI_NODE).whereEqualTo("recieverId", currentUser).get().await()
+                    .toObjects(MyNotification::class.java)
+            )
         }
     }
 
 
     @Throws(NoAuthExeption::class)
-    fun getFriendsList() : Flow<Friends> {
-        val currentUser = Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("getNotifications failure")
+    fun getFriendsList(): Flow<Friends> {
+        val currentUser =
+            Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("getNotifications failure")
 
-        return flow{
-            val list = db.collection(FRIENDS_NODE).document(currentUser).get().await().toObject(Friends::class.java)
+        return flow {
+            val list = db.collection(FRIENDS_NODE).document(currentUser).get().await()
+                .toObject(Friends::class.java)
             emit(list ?: Friends())
         }
     }
 
 
+    fun getPostById(id: String) =
+        flow {
+            val document = db.collection(POSTS_NODE).document(id).get().await()
+            document.data.let { map ->
+                val id = document.id
+                val author = map?.get("author").toString()
+                val timeStamp = (map?.get("timeStamp") as Timestamp).toDate().toString()
+                val descr = map["descr"].toString()
+                val fileUrl = map["fileUrl"].toString()
+                val post = Post(
+                    id = id,
+                    author = author,
+                    timeStamp = timeStamp,
+                    descr = descr,
+                    fileUrl = fileUrl
+                )
+                emit(post)
+            }
+
+        }
 }
 
 sealed class UnicValue {
@@ -201,19 +223,19 @@ class NoAuthExeption(message: String) : Exception(message)
 
 
 data class Friends(
-    val Friends : List<String> = emptyList(),
-    val Query : List<String> = emptyList()
+    val Friends: List<String> = emptyList(),
+    val Query: List<String> = emptyList()
 )
 
 data class MyNotification(
-    val recieverId : String = "",
+    val recieverId: String = "",
     val event: String = "",
     val authorID: String = "",
     val timeStamp: Timestamp = Timestamp.now(),
     val isViewed: Boolean = false,
-    val information : String = ""
-){
-    companion object{
+    val information: String = ""
+) {
+    companion object {
         const val EVENT_FRIEND_REQUEST = "friendRequest"
         const val EVENT_NEW_LIKE = "like"
         const val EVENT_NEW_COMMENT = "comment"
