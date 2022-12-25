@@ -1,6 +1,7 @@
 package com.ironmeddie.data.data.remote
 
 import android.util.Log
+import com.google.android.gms.tasks.Tasks.await
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
@@ -12,6 +13,7 @@ import com.ironmeddie.data.data.remote.MyNotification.Companion.EVENT_FRIEND_REQ
 import com.ironmeddie.data.data.remote.utils.PostDTO
 import com.ironmeddie.data.data.remote.utils.PostNodes
 import com.ironmeddie.data.data.remote.utils.UserNodes
+import com.ironmeddie.data.models.Post
 import com.ironmeddie.data.models.UserInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -62,9 +64,17 @@ class MyFireStore {
 
 
     fun getPosts(authorsId: List<String>) = flow{
-        val list = db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().toObjects(
-            PostDTO::class.java
-        ).map { it.toPost() }
+        val list =
+        db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().map {
+            Post(
+                id = it.id,
+                author = it.data["author"].toString(),
+                timeStamp = (it.data["timeStamp"] as Timestamp).toDate().toString(),
+                descr = it.data["descr"].toString(),
+                fileUrl = it.data["fileUrl"].toString()
+            )
+        }
+//        db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().toObjects(PostDTO::class.java).map { it.toPost() }
         emit(list)
     }
 

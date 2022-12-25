@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +24,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.ironmeddie.data.models.Post
 import com.stogramm.composetest3.R
 import com.stogramm.composetest3.ui.screens.NewsFeed.ListVM
+import com.stogramm.composetest3.ui.screens.NewsFeed.MainScreenState
 import com.stogramm.composetest3.ui.screens.PhotoWath.photoViewerRoute
 import com.stogramm.composetest3.ui.utilComposes.LikeButton
 
@@ -32,7 +34,8 @@ const val ItemViewerScreenRoute = "Item_viewer_route"
 @Composable
 fun LentaItemWatch(newsID : String?, vs: ListVM,navController: NavController, liked: (wellnessTask: Post) -> Unit) {
 
-    val wellnessTask =  vs.tasks.firstOrNull{ it.id == newsID } ?: Post()
+    val state = vs.tasks.collectAsState().value
+    val wellnessTask =  if (state is MainScreenState.Success) state.data.firstOrNull{ it.id == newsID } ?: Post() else Post()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { pad ->
         LazyColumn(
@@ -60,7 +63,7 @@ private fun Body(wellnessTask: Post, navController: NavController) {
                 .defaultMinSize(minHeight = 100.dp)
                 .fillMaxWidth()
                 .animateContentSize()
-                .clickable { navController.navigate(photoViewerRoute)  },
+                .clickable { navController.navigate(photoViewerRoute) },
             contentScale = ContentScale.FillWidth
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -94,10 +97,12 @@ private fun BottonsRow(wellnessTask: Post, liked: () -> Unit) {
             liked()
         }
 
-        Row(modifier = Modifier.padding(start = 23.dp).clip(CircleShape)
+        Row(modifier = Modifier
+            .padding(start = 23.dp)
+            .clip(CircleShape)
             .clickable {
-                            //  reply
-        }, verticalAlignment = Alignment.CenterVertically) {
+                //  reply
+            }, verticalAlignment = Alignment.CenterVertically) {
 
             Image(
                 painter = painterResource(id = R.drawable.ic_rep),

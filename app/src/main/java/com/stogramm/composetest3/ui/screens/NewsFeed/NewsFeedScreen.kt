@@ -11,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,33 +37,52 @@ fun NewsFeedScreen(
     navController: NavController,
     view: (wellnessTask: Post) -> Unit
 ) {
-    Scaffold(
-        topBar = {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "Stogramm", style = MaterialTheme.typography.h6, modifier = Modifier.padding(start = 16.dp))
-            Row(modifier = Modifier.padding(end = 16.dp)) {
-                IconButton(onClick = { navController.navigateToNewPostScreen() }) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "new post")
-                }
-                IconButton(onClick = { navController.navigateToSearchScreen() }) {
-                    Icon(imageVector = Icons.Default.Search, contentDescription = "search")
+
+    val state = ListVM.tasks.collectAsState().value
+    LaunchedEffect(key1 = true ){
+        ListVM.getNews()
+    }
+    when(state){
+        is MainScreenState.Success->{
+            Scaffold(
+                topBar = {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = "Stogramm", style = MaterialTheme.typography.h6, modifier = Modifier.padding(start = 16.dp))
+                        Row(modifier = Modifier.padding(end = 16.dp)) {
+                            IconButton(onClick = { navController.navigateToNewPostScreen() }) {
+                                Icon(imageVector = Icons.Default.Add, contentDescription = "new post")
+                            }
+                            IconButton(onClick = { navController.navigateToSearchScreen() }) {
+                                Icon(imageVector = Icons.Default.Search, contentDescription = "search")
+                            }
+                        }
+                    }
+
+                }) { paddingValues ->
+                LazyColumn(
+                    modifier = Modifier.padding(paddingValues)
+                ) {
+                    items(state.data, key = { it.id }) { itemscope ->
+                        NewsCard(
+                            itemscope,
+                            { ListVM.liked(itemscope) },
+                            {  },
+                            { view(it) })
+                    }
                 }
             }
+        }
+        is MainScreenState.Loading ->{
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }}
+        is MainScreenState.Error ->{
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = state.message)
+            }}
         }
 
-        }) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.padding(paddingValues)
-        ) {
-            items(ListVM.tasks, key = { it.id }) { itemscope ->
-                NewsCard(
-                    itemscope,
-                    { ListVM.liked(itemscope) },
-                    {  },
-                    { view(it) })
-            }
-        }
-    }
+
 
 
 }
