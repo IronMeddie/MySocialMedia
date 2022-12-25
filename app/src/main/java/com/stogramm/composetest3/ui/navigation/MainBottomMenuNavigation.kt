@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.ironmeddie.feature_notifications.NotificationScreen
 import com.stogramm.composetest3.ui.screens.NewsFeed.ListVM
 import com.stogramm.composetest3.ui.screens.NewsFeed.NewsFeedScreen
 import com.stogramm.composetest3.ui.screens.labudatest.LabudaTest
@@ -39,7 +40,7 @@ fun NavGraphBuilder.mainScreen(
             }
         }
         composable(route = NotificationNavigationRoute) {
-            LabudaTest()
+            NotificationScreen(navController = navController)
         }
     }
 

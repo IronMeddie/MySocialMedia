@@ -4,10 +4,7 @@ import android.net.Uri
 import com.example.test1.data.db.UserDao
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.ironmeddie.data.data.remote.FirebaseAuthApp
-import com.ironmeddie.data.data.remote.FirebaseStorageApp
-import com.ironmeddie.data.data.remote.MyFireStore
-import com.ironmeddie.data.data.remote.MyNotification
+import com.ironmeddie.data.data.remote.*
 import com.ironmeddie.data.domain.repository.MyRepository
 import com.ironmeddie.data.models.UserInfo
 import kotlinx.coroutines.CoroutineScope
@@ -62,17 +59,21 @@ class MyRepositoryImpl @Inject constructor(
 
     override fun getUserId() = Firebase.auth.currentUser?.uid
 
-    override fun getUserFriendList() : List<String> = emptyList() // todo get user friends
+    override fun getUserFriendList() : Flow<Friends> = firestore.getFriendsList()
 
     override fun getNotifications(): Flow<List<MyNotification>> = firestore.getNotifications()
 
-    override suspend fun getUserInformation(id: String) = firestore.getUserbyId()
+    override suspend fun getUserInformation(id: String) = firestore.getUserbyId(id)
 
-    override suspend fun getPosts(authorsList: List<String>) = firestore.getPosts(authorsList)
+    override fun getPosts(authorsList: List<String>) = firestore.getPosts(authorsList)
 
     override fun getUsersByValue(str:String) = firestore.getUsersListByValue(str)
 
     override suspend fun addFriend(id: String) {
         firestore.queryFriend(id)
+    }
+
+    override suspend fun agreeToFriend(id: String) {
+        firestore.agreeToFriend(id)
     }
 }

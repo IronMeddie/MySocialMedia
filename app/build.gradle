@@ -49,6 +49,7 @@ dependencies {
     implementation project(path: ':registerScreen')
     implementation project(path: ':feature_new_post')
     implementation project(path: ':feature_add_friend')
+    implementation project(path: ':feature_notifications')
     implementation project(path: ':gridComposable')
     implementation project(path: ':data')
 

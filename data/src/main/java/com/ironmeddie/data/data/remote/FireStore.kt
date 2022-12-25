@@ -1,8 +1,10 @@
 package com.ironmeddie.data.data.remote
 
 import android.util.Log
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
@@ -34,13 +36,6 @@ class MyFireStore {
                 "Query" to emptyList()
             )
         ).await()
-//        db.collection(NOTIFI_NODE).document(currentUser).set(
-//            hashMapOf(
-//                "friendRequest" to emptyList<String>(),
-//                "comments" to emptyList(),
-//                "likes" to emptyList()
-//            )
-//        ).await()
     }
 
 
@@ -66,10 +61,13 @@ class MyFireStore {
     }
 
 
-    suspend fun getPosts(authorsId: List<String>) =
-        db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().toObjects(
+    fun getPosts(authorsId: List<String>) = flow{
+        val list = db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().toObjects(
             PostDTO::class.java
         ).map { it.toPost() }
+        emit(list)
+    }
+
 
     suspend fun deletePost(id: String) = db.collection("posts").document(id).delete().await()
 
@@ -131,11 +129,20 @@ class MyFireStore {
             .update("Friends", FieldValue.arrayUnion(id)).await()
         db.collection(FRIENDS_NODE).document(id).update("Query", FieldValue.arrayUnion(currentUser))
             .await()
-        db.collection(NOTIFI_NODE).add(MyNotification(
-            event = EVENT_FRIEND_REQUEST,
-            authorID = currentUser,
-            recieverId = id
-        ))
+//        db.collection(NOTIFI_NODE).add(MyNotification(
+//            event = EVENT_FRIEND_REQUEST,
+//            authorID = currentUser,
+//            recieverId = id
+//        ))
+        db.collection(NOTIFI_NODE).add(
+            hashMapOf(
+                 "recieverId" to id,
+             "event" to EVENT_FRIEND_REQUEST,
+         "authorID" to currentUser,
+         "timeStamp" to FieldValue.serverTimestamp(),
+         "isViewed" to false
+            )
+        )
     }
 
     @Throws(NoAuthExeption::class)
@@ -157,6 +164,17 @@ class MyFireStore {
     }
 
 
+    @Throws(NoAuthExeption::class)
+    fun getFriendsList() : Flow<Friends> {
+        val currentUser = Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("getNotifications failure")
+
+        return flow{
+            val list = db.collection(FRIENDS_NODE).document(currentUser).get().await().toObject(Friends::class.java)
+            emit(list ?: Friends())
+        }
+    }
+
+
 }
 
 sealed class UnicValue {
@@ -171,11 +189,17 @@ sealed class UserInformationUpdate(information: String) {
 
 class NoAuthExeption(message: String) : Exception(message)
 
+
+data class Friends(
+    val Friends : List<String> = emptyList(),
+    val Query : List<String> = emptyList()
+)
+
 data class MyNotification(
-    val recieverId : String,
-    val event: String,
-    val authorID: String,
-    val timeStamp: FieldValue = FieldValue.serverTimestamp(),
+    val recieverId : String = "",
+    val event: String = "",
+    val authorID: String = "",
+    val timeStamp: Timestamp = Timestamp.now(),
     val isViewed: Boolean = false,
     val information : String = ""
 ){

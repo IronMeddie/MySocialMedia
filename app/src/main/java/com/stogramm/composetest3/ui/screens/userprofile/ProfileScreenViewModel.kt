@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.ironmeddie.data.models.Post
 import com.ironmeddie.domain.usecases.LogOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,8 +29,8 @@ class ProfileScreenViewModel @Inject constructor(private val logOutUseCase: LogO
     }
 
     fun getUserInfo() {
-        viewModelScope.launch {
-            list.addAll(getUserInfoUseCase())
-        }
+        getUserInfoUseCase().onEach {
+            list.addAll(it)
+        }.launchIn(viewModelScope)
     }
 }
