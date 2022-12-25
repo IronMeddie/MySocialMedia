@@ -13,9 +13,9 @@ import java.io.ByteArrayOutputStream
 internal fun compressUri(uri: Uri?, context: Context): Uri? {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && uri !=null) {
         try {
-            val thumbnail: Bitmap = context.contentResolver.loadThumbnail(uri, Size(640, 1000), null)
+            val thumbnail: Bitmap = context.contentResolver.loadThumbnail(uri, Size(1000, 1000), null)
             val outputStream = ByteArrayOutputStream()
-            thumbnail.compress(Bitmap.CompressFormat.JPEG,95,outputStream)
+            thumbnail.compress(Bitmap.CompressFormat.JPEG,100,outputStream)
             val path = MediaStore.Images.Media.insertImage(context.contentResolver,thumbnail,"val","null")
             outputStream.close()
             return Uri.parse(path)

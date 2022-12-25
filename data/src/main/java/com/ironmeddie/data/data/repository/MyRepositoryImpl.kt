@@ -7,10 +7,12 @@ import com.google.firebase.ktx.Firebase
 import com.ironmeddie.data.data.remote.FirebaseAuthApp
 import com.ironmeddie.data.data.remote.FirebaseStorageApp
 import com.ironmeddie.data.data.remote.MyFireStore
+import com.ironmeddie.data.data.remote.MyNotification
 import com.ironmeddie.data.domain.repository.MyRepository
 import com.ironmeddie.data.models.UserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -62,8 +64,9 @@ class MyRepositoryImpl @Inject constructor(
 
     override fun getUserFriendList() : List<String> = emptyList() // todo get user friends
 
+    override fun getNotifications(): Flow<List<MyNotification>> = firestore.getNotifications()
 
-    override suspend fun getUserInformation() = firestore.getUserbyId()
+    override suspend fun getUserInformation(id: String) = firestore.getUserbyId()
 
     override suspend fun getPosts(authorsList: List<String>) = firestore.getPosts(authorsList)
 

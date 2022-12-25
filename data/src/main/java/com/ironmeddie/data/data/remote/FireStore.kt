@@ -4,21 +4,21 @@ import android.util.Log
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.ironmeddie.data.data.remote.MyNotification.Companion.EVENT_FRIEND_REQUEST
 import com.ironmeddie.data.data.remote.utils.PostDTO
 import com.ironmeddie.data.data.remote.utils.PostNodes
 import com.ironmeddie.data.data.remote.utils.UserNodes
 import com.ironmeddie.data.models.UserInfo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 const val USERS_NODE = "users"
 const val POSTS_NODE = "posts"
 const val FRIENDS_NODE = "friendsList"
+const val NOTIFI_NODE = "notifications"
 
 
 class MyFireStore {
@@ -27,29 +27,43 @@ class MyFireStore {
 
     suspend fun addNewUser(userInfo: UserInfo) {
         val currentUser = userInfo.id
-        CoroutineScope(Dispatchers.IO).launch {
-            db.collection(USERS_NODE).document(userInfo.id).set(userInfo).await()
-            db.collection(FRIENDS_NODE).document((currentUser)).set(hashMapOf(
+        db.collection(USERS_NODE).document(userInfo.id).set(userInfo).await()
+        db.collection(FRIENDS_NODE).document(currentUser).set(
+            hashMapOf(
                 "Friends" to emptyList<String>(),
                 "Query" to emptyList()
-            )).await()
-        }
-
+            )
+        ).await()
+//        db.collection(NOTIFI_NODE).document(currentUser).set(
+//            hashMapOf(
+//                "friendRequest" to emptyList<String>(),
+//                "comments" to emptyList(),
+//                "likes" to emptyList()
+//            )
+//        ).await()
     }
 
 
-    suspend fun getUserbyId(userId: String = Firebase.auth.currentUser?.uid.toString()
+    @Throws(NoAuthExeption::class)
+    suspend fun getUserbyId(
+        userId: String = Firebase.auth.currentUser?.uid
+            ?: throw NoAuthExeption("getUserbyId failure")
     ) =
         db.collection(USERS_NODE).document(userId).get().await().toObject(UserInfo::class.java)
 
-    suspend fun newPost(description: String) = db.collection(POSTS_NODE).add(
-        hashMapOf(
-            PostNodes.descr to description,
-            PostNodes.timeStamp to FieldValue.serverTimestamp(),
-            PostNodes.author to  Firebase.auth.currentUser?.uid
 
-    )
-    ).await().id
+    @Throws(NoAuthExeption::class)
+    suspend fun newPost(description: String): String {
+        val currentUser = Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("newPost failure")
+        return db.collection(POSTS_NODE).add(
+            hashMapOf(
+                PostNodes.descr to description,
+                PostNodes.timeStamp to FieldValue.serverTimestamp(),
+                PostNodes.author to currentUser
+
+            )
+        ).await().id
+    }
 
 
     suspend fun getPosts(authorsId: List<String>) =
@@ -63,12 +77,13 @@ class MyFireStore {
         db.collection(POSTS_NODE).document(postId).update(PostNodes.fileUrl, url).await()
     }
 
+    @Throws(NoAuthExeption::class)
     suspend fun updateUserInformation(information: UserInformationUpdate) {
-        val currentUser = Firebase.auth.currentUser?.uid
+        val currentUser =
+            Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("updateUserInformation failure")
         when (information) {
             is UserInformationUpdate.AddFriend -> {
-                db.collection(USERS_NODE).document(currentUser.toString() + "/friendsList")
-                    .set(information.friendId)
+
             }
             //todo
             is UserInformationUpdate.ChangeUsername -> {
@@ -108,15 +123,37 @@ class MyFireStore {
             emit(list)
         }
 
+    @Throws(NoAuthExeption::class)
     suspend fun queryFriend(id: String) {
-        db.collection(FRIENDS_NODE).document((Firebase.auth.currentUser?.uid ?: "current user is null")).update("Friends", FieldValue.arrayUnion(id)).await()
-        db.collection(FRIENDS_NODE).document((id)).update("Query", FieldValue.arrayUnion(Firebase.auth.currentUser?.uid)).await()
+        val currentUser =
+            Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("queryFriend failure")
+        db.collection(FRIENDS_NODE).document(currentUser)
+            .update("Friends", FieldValue.arrayUnion(id)).await()
+        db.collection(FRIENDS_NODE).document(id).update("Query", FieldValue.arrayUnion(currentUser))
+            .await()
+        db.collection(NOTIFI_NODE).add(MyNotification(
+            event = EVENT_FRIEND_REQUEST,
+            authorID = currentUser,
+            recieverId = id
+        ))
     }
 
-    suspend fun agreeToFriend(id: String){
-        val currentUser = Firebase.auth.currentUser?.uid
-//        db.collection("friendsList").document((currentUser ?: return)).update("Friends", FieldValue.arrayUnion(id)).await()
-        db.collection(FRIENDS_NODE).document((id)).update("Query", FieldValue.arrayRemove(currentUser)).await()
+    @Throws(NoAuthExeption::class)
+    suspend fun agreeToFriend(id: String) {
+        val currentUser =
+            Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("agreeToFriend failure")
+        db.collection(FRIENDS_NODE).document(currentUser)
+            .update("Query", FieldValue.arrayRemove(id)).await()
+        db.collection(FRIENDS_NODE).document(currentUser)
+            .update("Friends", FieldValue.arrayUnion(id)).await()
+    }
+
+    @Throws(NoAuthExeption::class)
+    fun getNotifications(): Flow<List<MyNotification>> { // or get friendsList
+        val currentUser = Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("getNotifications failure")
+        return flow {
+            emit(db.collection(NOTIFI_NODE).whereEqualTo("recieverId",currentUser).get().await().toObjects(MyNotification::class.java))
+        }
     }
 
 
@@ -130,5 +167,22 @@ sealed class UnicValue {
 sealed class UserInformationUpdate(information: String) {
     data class AddFriend(val friendId: String) : UserInformationUpdate(friendId)
     data class ChangeUsername(val username: String) : UserInformationUpdate(username)
+}
+
+class NoAuthExeption(message: String) : Exception(message)
+
+data class MyNotification(
+    val recieverId : String,
+    val event: String,
+    val authorID: String,
+    val timeStamp: FieldValue = FieldValue.serverTimestamp(),
+    val isViewed: Boolean = false,
+    val information : String = ""
+){
+    companion object{
+        const val EVENT_FRIEND_REQUEST = "friendRequest"
+        const val EVENT_NEW_LIKE = "like"
+        const val EVENT_NEW_COMMENT = "comment"
+    }
 }
 

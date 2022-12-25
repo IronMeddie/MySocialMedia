@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/data" />
             <option value="$PROJECT_DIR$/feature_add_friend" />
             <option value="$PROJECT_DIR$/feature_new_post" />
+            <option value="$PROJECT_DIR$/feature_notifications" />
             <option value="$PROJECT_DIR$/gridComposable" />
             <option value="$PROJECT_DIR$/registerScreen" />
           </set>
