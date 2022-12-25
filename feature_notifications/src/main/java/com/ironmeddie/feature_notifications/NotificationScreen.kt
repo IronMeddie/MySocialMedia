@@ -30,8 +30,8 @@ fun NotificationScreen(
 ) {
     val list = viewModel.notifications.collectAsState().value
     Scaffold(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(modifier = Modifier.padding(it)) {
-            items(list) { notification ->
+        LazyColumn(modifier = Modifier.padding(it), verticalArrangement = Arrangement.spacedBy(8.dp), contentPadding = PaddingValues(vertical = 8.dp)) {
+            items(list, key = { it.timeStamp }) { notification ->
                 NotificationFriendRequest(
                     notification,
                     onNavigate = {

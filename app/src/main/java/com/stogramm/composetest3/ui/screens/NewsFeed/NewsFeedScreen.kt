@@ -29,6 +29,7 @@ import com.ironmeddie.feature_add_friend.navigation.navigateToSearchScreen
 import com.ironmeddie.feature_new_post.presentation.navigation.navigateToNewPostScreen
 import com.stogramm.composetest3.R
 import com.stogramm.composetest3.ui.utilComposes.LikeButton
+import kotlinx.coroutines.delay
 
 
 @Composable
@@ -39,7 +40,8 @@ fun NewsFeedScreen(
 ) {
 
     val state = ListVM.tasks.collectAsState().value
-    LaunchedEffect(key1 = true ){
+    LaunchedEffect(key1 = true){
+        delay(1000)
         ListVM.getNews()
     }
     when(state){

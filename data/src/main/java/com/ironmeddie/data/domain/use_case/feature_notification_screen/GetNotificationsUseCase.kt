@@ -22,7 +22,7 @@ class GetNotificationsUseCase @Inject constructor(private val repository: MyRepo
                       information = userInfo.secondname + " " + userInfo.firstname + " хочет дружить",
                       isFriend = friends.Friends.contains(notification.authorID)
                   )
-              }.sortedBy { it.timeStamp }
+              }.sortedByDescending { it.timeStamp }
           }
       }
 

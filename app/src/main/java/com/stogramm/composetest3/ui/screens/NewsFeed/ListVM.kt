@@ -49,12 +49,16 @@ class ListVM @Inject constructor(
 
 
     fun getNews() {
-        job?.cancel()
-        job = getPosts().onEach {
-            _tasks.value = MainScreenState.Success(data = it)
-        }.catch { e ->
-            _tasks.value = MainScreenState.Error(e.message.toString())
-        }.launchIn(viewModelScope)
+        if (loginState == true){
+            job?.cancel()
+            job = getPosts().onEach {
+                _tasks.value = MainScreenState.Success(data = it)
+            }.catch { e ->
+                _tasks.value = MainScreenState.Error(e.message.toString())
+            }.launchIn(viewModelScope)
+        }else{
+            _tasks.value = MainScreenState.Error("login state is not true")
+        }
     }
 }
 

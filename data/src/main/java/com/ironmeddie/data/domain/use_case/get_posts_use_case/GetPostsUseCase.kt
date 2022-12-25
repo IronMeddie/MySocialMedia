@@ -13,7 +13,7 @@ class GetPostsUseCase @Inject constructor(private val repository: MyRepository) 
             list.addAll(it.Friends)
             Log.d("checkCode", list.toString())
                 repository.getPosts(list).map { listPosts->
-                    listPosts.sortedBy { it.timeStamp }
+                    listPosts.sortedByDescending { it.timeStamp }
                 }
         }
 }

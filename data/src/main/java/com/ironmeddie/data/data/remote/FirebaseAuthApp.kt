@@ -9,7 +9,6 @@ class FirebaseAuthApp {
 
     val auth = Firebase.auth
 
-
     suspend fun checkAuth() = Firebase.auth.currentUser != null
 
     suspend fun signIn(email: String, password: String) =

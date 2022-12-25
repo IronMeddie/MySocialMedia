@@ -1,6 +1,5 @@
 package com.ironmeddie.data.data.remote
 
-import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
@@ -123,7 +122,6 @@ class MyFireStore {
 //                list.addAll(firs)
 //                list.addAll(sec)
 //            }
-            Log.d("checkCode", list.size.toString())
             emit(list)
         }
 
@@ -207,6 +205,8 @@ class MyFireStore {
             }
 
         }
+
+
 }
 
 sealed class UnicValue {
