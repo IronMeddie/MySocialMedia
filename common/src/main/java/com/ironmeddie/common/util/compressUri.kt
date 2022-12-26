@@ -1,4 +1,4 @@
-package com.ironmeddie.feature_new_post.presentation.util
+package com.ironmeddie.common.util
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -10,7 +10,7 @@ import android.util.Size
 import android.widget.Toast
 import java.io.ByteArrayOutputStream
 
-internal fun compressUri(uri: Uri?, context: Context): Uri? {
+fun compressUri(uri: Uri?, context: Context): Uri? {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && uri !=null) {
         try {
             val thumbnail: Bitmap = context.contentResolver.loadThumbnail(uri, Size(1000, 1000), null)

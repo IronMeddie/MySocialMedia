@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.ironmeddie.common.util.compressUri
 import com.stogramm.composetest3.R
 import com.stogramm.composetest3.ui.screens.ItemDetails.ItemViewerScreenRoute
 import com.stogramm.composetest3.ui.screens.ItemDetails.navigateToItemDetails
@@ -101,9 +103,6 @@ fun UserProfile(navController: NavController,viewModel: ProfileScreenViewModel =
 @Composable
 fun TopBarProfile(state: ProfileState, logOut: () -> Unit) {
     Box(Modifier.fillMaxWidth()) {
-        val buttonscolor = ButtonDefaults.buttonColors(White100)
-        val buttonElevation = ButtonDefaults.elevation(0.dp)
-        val buttonBorder = ButtonDefaults.outlinedBorder
 
         var expanded by remember { mutableStateOf(false) }
         Spacer(modifier = Modifier.width(16.dp))
@@ -132,9 +131,10 @@ fun TopBarProfile(state: ProfileState, logOut: () -> Unit) {
 
 @Composable
 fun HeaderProfile(state: ProfileState, onAvatarChange : (uri: Uri) -> Unit) {
+    val context = LocalContext.current
     val contract = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()){
         if (it != null){
-            onAvatarChange(it)
+            onAvatarChange(compressUri(it, context = context) ?: Uri.EMPTY)
         }
     }
     Row(
@@ -147,6 +147,7 @@ fun HeaderProfile(state: ProfileState, onAvatarChange : (uri: Uri) -> Unit) {
         Image(
             painter = rememberAsyncImagePainter(model = state.userInfo.avatarUrl ?: "https://sun9-49.userapi.com/impg/dumo-sHwZAWYqvoYtuGZOLpG2QneZboefOhpCw/ilH2Qqmra_I.jpg?size=748x744&quality=96&sign=d8c5c4a797e03fa9f9b032e22b863fa9&type=album"),
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(100.dp)
                 .clip(shape = CircleShape)

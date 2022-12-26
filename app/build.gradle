@@ -51,6 +51,7 @@ dependencies {
     implementation project(path: ':feature_add_friend')
     implementation project(path: ':feature_notifications')
     implementation project(path: ':gridComposable')
+    implementation project(path: ':common')
     implementation project(path: ':data')
 
 

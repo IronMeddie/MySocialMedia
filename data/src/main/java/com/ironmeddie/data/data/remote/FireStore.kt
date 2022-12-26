@@ -63,6 +63,7 @@ class MyFireStore {
 
 
     fun getPosts(authorsId: List<String>) = flow {
+        Log.d("checkCode", "getPosts floe started")
         val list =
             db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().map {
                 Post(
@@ -73,6 +74,7 @@ class MyFireStore {
                     fileUrl = it.data["fileUrl"].toString()
                 )
             }
+
 //        db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().toObjects(PostDTO::class.java).map { it.toPost() }
         emit(list)
     }

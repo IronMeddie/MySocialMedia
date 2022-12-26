@@ -18,7 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ironmeddie.common.TransparentHintTextField
-import com.ironmeddie.feature_new_post.presentation.util.compressUri
+import com.ironmeddie.common.util.compressUri
 import kotlinx.coroutines.launch
 
 

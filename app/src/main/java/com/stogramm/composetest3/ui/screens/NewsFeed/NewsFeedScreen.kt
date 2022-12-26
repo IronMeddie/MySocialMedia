@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,22 +42,36 @@ fun NewsFeedScreen(
 ) {
 
     val state = ListVM.tasks.collectAsState().value
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
         delay(1000)
         ListVM.getNews()
     }
-    when(state){
-        is MainScreenState.Success->{
+    when (state) {
+        is MainScreenState.Success -> {
             Scaffold(
                 topBar = {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = "Stogramm", style = MaterialTheme.typography.h6, modifier = Modifier.padding(start = 16.dp))
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Stogramm",
+                            style = MaterialTheme.typography.h6,
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
                         Row(modifier = Modifier.padding(end = 16.dp)) {
                             IconButton(onClick = { navController.navigateToNewPostScreen() }) {
-                                Icon(imageVector = Icons.Default.Add, contentDescription = "new post")
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "new post"
+                                )
                             }
                             IconButton(onClick = { navController.navigateToSearchScreen() }) {
-                                Icon(imageVector = Icons.Default.Search, contentDescription = "search")
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = "search"
+                                )
                             }
                         }
                     }
@@ -69,23 +84,23 @@ fun NewsFeedScreen(
                         NewsCard(
                             post,
                             { ListVM.liked(post.post) },
-                            {  },
+                            { },
                             { view(it) })
                     }
                 }
             }
         }
-        is MainScreenState.Loading ->{
+        is MainScreenState.Loading -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
-            }}
-        is MainScreenState.Error ->{
+            }
+        }
+        is MainScreenState.Error -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(text = state.message)
-            }}
+            }
         }
-
-
+    }
 
 
 }
@@ -114,15 +129,20 @@ fun NewsCard(
             AsyncImage(
                 model = if (!wellnessTask.author.avatarUrl.isNullOrEmpty()) wellnessTask.author.avatarUrl else R.drawable.ic_launcher_background,
                 contentDescription = null,
-                Modifier
+                modifier = Modifier
                     .clip(shape = CircleShape)
-                    .size(54.dp)
+                    .size(54.dp),
+                contentScale = ContentScale.Crop,
             )
             Column(
                 modifier = Modifier.padding(start = 10.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = wellnessTask.author.username.toString(), fontSize = 18.sp, fontWeight = FontWeight(600))
+                Text(
+                    text = wellnessTask.author.username.toString(),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight(600)
+                )
                 Text(
                     text = wellnessTask.post.timeStamp.toString(),
                     fontSize = 16.sp,
@@ -132,7 +152,7 @@ fun NewsCard(
             }
         }
         Text(text = wellnessTask.post.descr,
-            maxLines = 3 ,
+            maxLines = 3,
             modifier = Modifier
                 .padding(start = 7.dp, end = 7.dp, top = 5.dp)
                 .clickable { bodycheked() })
@@ -152,13 +172,15 @@ fun NewsCard(
             LikeButton(wellnessTask) {
                 liked()
             }
-            Row(modifier = Modifier
-                .padding(start = 23.dp)
-                .size(35.dp)
-                .clip(CircleShape)
-                .clickable { },
+            Row(
+                modifier = Modifier
+                    .padding(start = 23.dp)
+                    .size(35.dp)
+                    .clip(CircleShape)
+                    .clickable { },
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center) {
+                horizontalArrangement = Arrangement.Center
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_comment),
                     contentDescription = "comment",
