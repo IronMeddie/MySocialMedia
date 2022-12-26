@@ -32,6 +32,7 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.stogramm.composetest3.R
 import com.stogramm.composetest3.ui.screens.ItemDetails.ItemViewerScreenRoute
+import com.stogramm.composetest3.ui.screens.ItemDetails.navigateToItemDetails
 import com.stogramm.composetest3.ui.theme.TextGrey
 import com.stogramm.composetest3.ui.theme.White100
 
@@ -90,7 +91,7 @@ fun UserProfile(navController: NavController,viewModel: ProfileScreenViewModel =
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.clickable {
-                        navController.navigate(ItemViewerScreenRoute + "/${it.id}")
+                    navController.navigateToItemDetails(it.id)
                 }
             )
         }

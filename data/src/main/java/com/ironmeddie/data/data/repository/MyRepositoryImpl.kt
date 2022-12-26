@@ -95,4 +95,10 @@ class MyRepositoryImpl @Inject constructor(
 
 
     }
+
+    override suspend fun like(postId: String) {
+        firestore.like(postId)
+    }
+
+    override fun getLikes(postId: String): Flow<List<String>> = firestore.getLikes(postId)
 }

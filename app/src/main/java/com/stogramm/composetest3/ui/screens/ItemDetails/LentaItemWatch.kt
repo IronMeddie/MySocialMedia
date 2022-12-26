@@ -21,7 +21,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.ironmeddie.data.domain.use_case.get_posts_use_case.PostWithAuthor
 import com.ironmeddie.data.models.Post
 import com.stogramm.composetest3.R
 import com.stogramm.composetest3.ui.screens.NewsFeed.ListVM
@@ -36,7 +38,7 @@ const val ItemViewerScreenRoute = "Item_viewer_route"
 fun LentaItemWatch(newsID : String?, vs: ListVM,navController: NavController, liked: (wellnessTask: Post) -> Unit) {
 
     val state = vs.tasks.collectAsState().value
-    val wellnessTask =  if (state is MainScreenState.Success) state.data.firstOrNull{ it.post.id == newsID }?.post ?: Post() else Post()
+    val wellnessTask =  if (state is MainScreenState.Success) state.data.firstOrNull{ it.post.id == newsID } else null
 
     Scaffold(modifier = Modifier.fillMaxSize()) { pad ->
         LazyColumn(
@@ -45,14 +47,15 @@ fun LentaItemWatch(newsID : String?, vs: ListVM,navController: NavController, li
             item { Headermy(wellnessTask) }
             item { Body(wellnessTask, navController)}
             item {
-                BottonsRow(wellnessTask, liked = { liked(wellnessTask) })
+                BottonsRow(wellnessTask?.post ?: Post() ) { liked(wellnessTask?.post ?: Post() ) }
             }
         }
     }
 }
 
 @Composable
-private fun Body(wellnessTask: Post, navController: NavController) {
+private fun Body(post: PostWithAuthor?, navController: NavController) {
+    val wellnessTask = post?.post ?: Post()
     Log.d("checkCode", wellnessTask.fileUrl)
     Column(modifier = Modifier.padding(7.dp)) {
         Text(
@@ -119,15 +122,15 @@ private fun BottonsRow(wellnessTask: Post, liked: () -> Unit) {
 }
 
 @Composable
-private fun Headermy(wellnessTask: Post) {
+private fun Headermy(wellnessTask: PostWithAuthor?) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(7.dp)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_launcher_background),
-            contentDescription = "fgd",
+        AsyncImage(
+            model = if (wellnessTask?.author?.avatarUrl.isNullOrEmpty()) painterResource(id = R.drawable.ic_launcher_background) else wellnessTask?.author?.avatarUrl,
+            contentDescription = "avatar of author",
             Modifier
                 .clip(shape = CircleShape)
                 .size(54.dp)
@@ -136,9 +139,9 @@ private fun Headermy(wellnessTask: Post) {
             modifier = Modifier.padding(start = 10.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = wellnessTask.author, fontSize = 18.sp, fontWeight = FontWeight(600))
+            Text(text = wellnessTask?.author?.username ?: "unknown user", fontSize = 18.sp, fontWeight = FontWeight(600))
             Text(
-                text = wellnessTask.timeStamp.toString(),
+                text = wellnessTask?.post?.timeStamp.toString(),
                 fontSize = 16.sp,
                 fontWeight = FontWeight(300),
                 color = Color.Gray

@@ -1,12 +1,12 @@
 package com.stogramm.composetest3.ui.screens.ItemDetails
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import com.ironmeddie.data.models.Post
 
 
-class ItemViewVM(savedStateHandle: SavedStateHandle, application : Application) : AndroidViewModel(application) {
+class ItemViewVM(savedStateHandle: SavedStateHandle) : ViewModel() {
+
     private val userId: Post = checkNotNull(savedStateHandle["task"])
 
     fun liked(item: Post) {

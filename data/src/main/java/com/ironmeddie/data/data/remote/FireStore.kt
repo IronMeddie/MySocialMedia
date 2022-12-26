@@ -5,6 +5,8 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.getField
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.ironmeddie.data.data.remote.utils.PostNodes
 import com.ironmeddie.data.data.remote.utils.UserNodes
@@ -20,6 +22,7 @@ const val USERS_NODE = "users"
 const val POSTS_NODE = "posts"
 const val FRIENDS_NODE = "friendsList"
 const val NOTIFI_NODE = "notifications"
+const val LIKES_NODE = "likes"
 
 
 class MyFireStore {
@@ -36,7 +39,6 @@ class MyFireStore {
             )
         ).await()
     }
-
 
     @Throws(NoAuthExeption::class)
     suspend fun getUserbyId(
@@ -99,9 +101,6 @@ class MyFireStore {
             }
         }
     }
-
-
-
 
 
     suspend fun checkAlreadyUsed(value: UnicValue): Boolean {
@@ -214,7 +213,17 @@ class MyFireStore {
 
         }
 
+    @Throws(NoAuthExeption::class)
+    suspend fun like(postId: String){
+        val currentUser = Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("like failure")
+        val data = hashMapOf<String,Any>("id" to FieldValue.arrayUnion(currentUser))
+        db.collection(LIKES_NODE).document(postId).set(data).await()
+    }
 
+    fun getLikes(postId: String)= flow {
+        val list = db.collection(LIKES_NODE).document(postId).get().await().toObject<Likes>()?.id ?: emptyList()
+        emit(list)
+    }
 }
 
 sealed class UnicValue {
@@ -227,6 +236,7 @@ sealed class UserInformationUpdate(information: String) {
     data class Avatar(val fileUrl: String) : UserInformationUpdate(fileUrl)
     data class About(val desc: String) : UserInformationUpdate(desc)
 }
+data class Likes(val id : List<String> = emptyList())
 
 class NoAuthExeption(message: String) : Exception(message)
 
