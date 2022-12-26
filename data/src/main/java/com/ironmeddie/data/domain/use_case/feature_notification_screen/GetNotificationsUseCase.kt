@@ -17,7 +17,7 @@ class GetNotificationsUseCase @Inject constructor(private val repository: MyRepo
                       recieverId = notification.recieverId,
                       event = notification.event,
                       authorID = notification.authorID,
-                      timeStamp = notification.timeStamp.toDate().toString(),
+                      timeStamp = notification.timeStamp.toString(),
                       isViewed = notification.isViewed,
                       information = userInfo.secondname + " " + userInfo.firstname + " хочет дружить",
                       isFriend = friends.Friends.contains(notification.authorID)

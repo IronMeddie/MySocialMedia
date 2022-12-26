@@ -19,7 +19,7 @@ data class PostDTO(
         return Post(
              id =  id,
          author= author,
-         timeStamp = timeStamp.toString(),
+         timeStamp = timeStamp.toDate(),
          descr=  descr,
          likes = likes,
          commentcount = commentcount,

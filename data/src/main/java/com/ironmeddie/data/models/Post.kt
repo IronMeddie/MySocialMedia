@@ -1,10 +1,12 @@
 package com.ironmeddie.data.models
 
+import java.util.*
+
 
 data class Post(
     val id: String =  "",
     val author: String=  "",
-    val timeStamp: String = "",
+    val timeStamp: Date = Date(),
     val descr: String=  "",
     var likes: Int = 0,
     val commentcount: Int = 0,

@@ -1,13 +1,15 @@
 package com.ironmeddie.data.data.remote
 
+import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.ironmeddie.data.data.remote.MyNotification.Companion.EVENT_FRIEND_REQUEST
 import com.ironmeddie.data.data.remote.utils.PostNodes
 import com.ironmeddie.data.data.remote.utils.UserNodes
+import com.ironmeddie.data.models.MyNotification
+import com.ironmeddie.data.models.MyNotification.Companion.EVENT_FRIEND_REQUEST
 import com.ironmeddie.data.models.Post
 import com.ironmeddie.data.models.UserInfo
 import kotlinx.coroutines.flow.Flow
@@ -64,7 +66,7 @@ class MyFireStore {
                 Post(
                     id = it.id,
                     author = it.data["author"].toString(),
-                    timeStamp = (it.data["timeStamp"] as Timestamp).toDate().toString(),
+                    timeStamp = (it.data["timeStamp"] as Timestamp).toDate(),
                     descr = it.data["descr"].toString(),
                     fileUrl = it.data["fileUrl"].toString()
                 )
@@ -85,15 +87,22 @@ class MyFireStore {
         val currentUser =
             Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("updateUserInformation failure")
         when (information) {
-            is UserInformationUpdate.AddFriend -> {
-
-            }
-            //todo
             is UserInformationUpdate.ChangeUsername -> {
-
+                db.collection(USERS_NODE).document(currentUser).update(UserNodes.username, information.username).await()
+            }
+            is UserInformationUpdate.Avatar ->{
+                Log.d("checkCode", "AvatarChanging")
+             db.collection(USERS_NODE).document(currentUser).update(UserNodes.avatarUrl, information.fileUrl).await()
+            }
+            is UserInformationUpdate.About ->{
+                db.collection(USERS_NODE).document(currentUser).update(UserNodes.about, information.desc).await()
             }
         }
     }
+
+
+
+
 
     suspend fun checkAlreadyUsed(value: UnicValue): Boolean {
         // проверяем есть ли уже в базе такие значения. Не уверен, что авсе будет работать правильно нужно протестить
@@ -176,7 +185,6 @@ class MyFireStore {
     fun getFriendsList(): Flow<Friends> {
         val currentUser =
             Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("getNotifications failure")
-
         return flow {
             val list = db.collection(FRIENDS_NODE).document(currentUser).get().await()
                 .toObject(Friends::class.java)
@@ -191,7 +199,7 @@ class MyFireStore {
             document.data.let { map ->
                 val id = document.id
                 val author = map?.get("author").toString()
-                val timeStamp = (map?.get("timeStamp") as Timestamp).toDate().toString()
+                val timeStamp = (map?.get("timeStamp") as Timestamp).toDate()
                 val descr = map["descr"].toString()
                 val fileUrl = map["fileUrl"].toString()
                 val post = Post(
@@ -215,8 +223,9 @@ sealed class UnicValue {
 }
 
 sealed class UserInformationUpdate(information: String) {
-    data class AddFriend(val friendId: String) : UserInformationUpdate(friendId)
     data class ChangeUsername(val username: String) : UserInformationUpdate(username)
+    data class Avatar(val fileUrl: String) : UserInformationUpdate(fileUrl)
+    data class About(val desc: String) : UserInformationUpdate(desc)
 }
 
 class NoAuthExeption(message: String) : Exception(message)
@@ -227,18 +236,5 @@ data class Friends(
     val Query: List<String> = emptyList()
 )
 
-data class MyNotification(
-    val recieverId: String = "",
-    val event: String = "",
-    val authorID: String = "",
-    val timeStamp: Timestamp = Timestamp.now(),
-    val isViewed: Boolean = false,
-    val information: String = ""
-) {
-    companion object {
-        const val EVENT_FRIEND_REQUEST = "friendRequest"
-        const val EVENT_NEW_LIKE = "like"
-        const val EVENT_NEW_COMMENT = "comment"
-    }
-}
+
 

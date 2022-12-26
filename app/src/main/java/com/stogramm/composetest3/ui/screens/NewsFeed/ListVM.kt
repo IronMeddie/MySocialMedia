@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ironmeddie.data.data.remote.FirebaseAuthApp
 import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostsUseCase
+import com.ironmeddie.data.domain.use_case.get_posts_use_case.PostWithAuthor
 import com.ironmeddie.data.models.Post
+import com.ironmeddie.data.models.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -62,9 +64,11 @@ class ListVM @Inject constructor(
     }
 }
 
+
+
 sealed class MainScreenState{
     object Loading : MainScreenState()
-    data class Success(val data : List<Post>) : MainScreenState()
+    data class Success(val data : List<PostWithAuthor>) : MainScreenState()
     data class Error(val message : String) : MainScreenState()
 }
 

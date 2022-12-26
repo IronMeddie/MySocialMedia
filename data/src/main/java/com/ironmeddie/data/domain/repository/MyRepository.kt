@@ -2,7 +2,7 @@ package com.ironmeddie.data.domain.repository
 
 import android.net.Uri
 import com.ironmeddie.data.data.remote.Friends
-import com.ironmeddie.data.data.remote.MyNotification
+import com.ironmeddie.data.models.MyNotification
 import com.ironmeddie.data.models.Post
 import com.ironmeddie.data.models.UserInfo
 import kotlinx.coroutines.flow.Flow
@@ -40,5 +40,7 @@ interface MyRepository {
     suspend fun agreeToFriend(id: String)
 
     fun getPostById(id: String): Flow<Post>
+
+    fun loadAvatar(uri: Uri)
 
 }

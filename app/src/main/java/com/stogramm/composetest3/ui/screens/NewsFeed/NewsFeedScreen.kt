@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.ironmeddie.data.domain.use_case.get_posts_use_case.PostWithAuthor
 import com.ironmeddie.data.models.Post
 import com.ironmeddie.feature_add_friend.navigation.navigateToSearchScreen
 import com.ironmeddie.feature_new_post.presentation.navigation.navigateToNewPostScreen
@@ -64,10 +65,10 @@ fun NewsFeedScreen(
                 LazyColumn(
                     modifier = Modifier.padding(paddingValues)
                 ) {
-                    items(state.data, key = { it.id }) { itemscope ->
+                    items(state.data, key = { it.post.id }) { post ->
                         NewsCard(
-                            itemscope,
-                            { ListVM.liked(itemscope) },
+                            post,
+                            { ListVM.liked(post.post) },
                             {  },
                             { view(it) })
                     }
@@ -92,7 +93,7 @@ fun NewsFeedScreen(
 
 @Composable
 fun NewsCard(
-    wellnessTask: Post,
+    wellnessTask: PostWithAuthor,
     liked: () -> Unit,
     bodycheked: () -> Unit,
     view: (wellnessTask: Post) -> Unit
@@ -102,7 +103,7 @@ fun NewsCard(
             .fillMaxWidth()
             .padding(bottom = 5.dp)
             .clip(MaterialTheme.shapes.medium)
-            .clickable { view(wellnessTask) },
+            .clickable { view(wellnessTask.post) },
     ) {
         Row(
             modifier = Modifier
@@ -110,8 +111,8 @@ fun NewsCard(
                 .padding(top = 10.dp, start = 10.dp),
             horizontalArrangement = Arrangement.Start
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background),
+            AsyncImage(
+                model = if (!wellnessTask.author.avatarUrl.isNullOrEmpty()) wellnessTask.author.avatarUrl else R.drawable.ic_launcher_background,
                 contentDescription = null,
                 Modifier
                     .clip(shape = CircleShape)
@@ -121,22 +122,22 @@ fun NewsCard(
                 modifier = Modifier.padding(start = 10.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = wellnessTask.author, fontSize = 18.sp, fontWeight = FontWeight(600))
+                Text(text = wellnessTask.author.username.toString(), fontSize = 18.sp, fontWeight = FontWeight(600))
                 Text(
-                    text = wellnessTask.timeStamp.toString(),
+                    text = wellnessTask.post.timeStamp.toString(),
                     fontSize = 16.sp,
                     fontWeight = FontWeight(300),
                     color = Color.Gray
                 )
             }
         }
-        Text(text = wellnessTask.descr,
+        Text(text = wellnessTask.post.descr,
             maxLines = 3 ,
             modifier = Modifier
                 .padding(start = 7.dp, end = 7.dp, top = 5.dp)
                 .clickable { bodycheked() })
         AsyncImage(
-            model = wellnessTask.fileUrl,
+            model = wellnessTask.post.fileUrl,
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
@@ -148,7 +149,7 @@ fun NewsCard(
                 .padding(7.dp)
                 .height(35.dp)
         ) {
-            LikeButton(wellnessTask) {
+            LikeButton(wellnessTask.post) {
                 liked()
             }
             Row(modifier = Modifier
@@ -164,7 +165,7 @@ fun NewsCard(
                     modifier = Modifier.size(30.dp)
                 )
                 Text(
-                    text = if (wellnessTask.commentcount > 0) wellnessTask.commentcount.toString() else "",
+                    text = if (wellnessTask.post.commentcount > 0) wellnessTask.post.commentcount.toString() else "",
                     modifier = Modifier.padding(start = 2.dp)
                 )
             }
@@ -190,6 +191,6 @@ fun NewsCard(
 @Preview
 @Composable
 fun prewitemlenta() {
-    val task = Post(id = "s")
-    NewsCard(task, {}, {}, {})
+//    val task = Post(id = "s")
+//    NewsCard(task, {}, {}, {})
 }

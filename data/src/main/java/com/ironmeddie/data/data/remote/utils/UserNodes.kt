@@ -11,4 +11,6 @@ object UserNodes{
     const val posts  = "posts"
     const val friendsList = "friendsList"
     const val friendRequests = "friendRequests"
+    const val avatarUrl = "avatarUrl"
+    const val about = "about"
 }

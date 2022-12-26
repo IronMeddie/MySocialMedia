@@ -36,7 +36,7 @@ const val ItemViewerScreenRoute = "Item_viewer_route"
 fun LentaItemWatch(newsID : String?, vs: ListVM,navController: NavController, liked: (wellnessTask: Post) -> Unit) {
 
     val state = vs.tasks.collectAsState().value
-    val wellnessTask =  if (state is MainScreenState.Success) state.data.firstOrNull{ it.id == newsID } ?: Post() else Post()
+    val wellnessTask =  if (state is MainScreenState.Success) state.data.firstOrNull{ it.post.id == newsID }?.post ?: Post() else Post()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { pad ->
         LazyColumn(

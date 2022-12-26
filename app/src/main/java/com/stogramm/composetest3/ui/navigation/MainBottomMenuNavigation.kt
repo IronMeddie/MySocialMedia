@@ -35,7 +35,7 @@ fun NavGraphBuilder.mainScreen(
             }
         }
         composable(route = userProfileNavigationRoute) {
-            UserProfile() {
+            UserProfile(navController) {
                 navController.navigateToLoginScreen()
             }
         }
