@@ -149,7 +149,7 @@ fun NewsCard(
                 .padding(7.dp)
                 .height(35.dp)
         ) {
-            LikeButton(wellnessTask.post) {
+            LikeButton(wellnessTask) {
                 liked()
             }
             Row(modifier = Modifier

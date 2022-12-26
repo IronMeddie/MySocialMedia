@@ -73,9 +73,9 @@ class ListVM @Inject constructor(
 
 
     fun getLikes(postId: String){
-        getLikesUseCase(postId).onEach {
-            Log.d("checkCode", it.toString())
-        }.launchIn(viewModelScope)
+//        getLikesUseCase(postId).onEach {
+//            Log.d("checkCode", it.toString())
+//        }.launchIn(viewModelScope)
     }
 }
 

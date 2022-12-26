@@ -14,24 +14,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.ironmeddie.data.domain.use_case.get_posts_use_case.PostWithAuthor
 import com.ironmeddie.data.models.Post
 import com.stogramm.composetest3.R
 import com.stogramm.composetest3.ui.theme.GreyButtoncont
 
 @Composable
-fun LikeButton(wellnessTask : Post, liked:  () -> Unit) {
+fun LikeButton(wellnessTask : PostWithAuthor, liked:  () -> Unit) {
     Row(modifier = Modifier.padding(start = 23.dp).fillMaxHeight().clip(CircleShape).clickable { liked() }, verticalAlignment = Alignment.CenterVertically) {
         Image(
             painter =
-//            if (!wellnessTask.liked)
+            if (!wellnessTask.liked)
                 painterResource(id = R.drawable.ic_like_bord)
-//            else painterResource(id = R.drawable.ic_like)
+            else painterResource(id = R.drawable.ic_like)
             ,
             contentDescription = "likes",
             modifier = Modifier.size(30.dp)
         )
         Text(
-            text = if (wellnessTask.likes > 0) wellnessTask.likes.toString() else "",
+            text = if (wellnessTask.likes.size > 0) wellnessTask.likes.size.toString() else "",
             color = GreyButtoncont
         )
     }

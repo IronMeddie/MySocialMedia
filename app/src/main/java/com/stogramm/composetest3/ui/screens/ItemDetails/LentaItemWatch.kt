@@ -38,7 +38,7 @@ const val ItemViewerScreenRoute = "Item_viewer_route"
 fun LentaItemWatch(newsID : String?, vs: ListVM,navController: NavController, liked: (wellnessTask: Post) -> Unit) {
 
     val state = vs.tasks.collectAsState().value
-    val wellnessTask =  if (state is MainScreenState.Success) state.data.firstOrNull{ it.post.id == newsID } else null
+    val wellnessTask =  if (state is MainScreenState.Success) state.data.firstOrNull{ it.post.id == newsID } ?: PostWithAuthor() else PostWithAuthor()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { pad ->
         LazyColumn(
@@ -47,15 +47,15 @@ fun LentaItemWatch(newsID : String?, vs: ListVM,navController: NavController, li
             item { Headermy(wellnessTask) }
             item { Body(wellnessTask, navController)}
             item {
-                BottonsRow(wellnessTask?.post ?: Post() ) { liked(wellnessTask?.post ?: Post() ) }
+                BottonsRow(wellnessTask) { liked(wellnessTask.post ) }
             }
         }
     }
 }
 
 @Composable
-private fun Body(post: PostWithAuthor?, navController: NavController) {
-    val wellnessTask = post?.post ?: Post()
+private fun Body(post: PostWithAuthor, navController: NavController) {
+    val wellnessTask = post.post
     Log.d("checkCode", wellnessTask.fileUrl)
     Column(modifier = Modifier.padding(7.dp)) {
         Text(
@@ -96,7 +96,7 @@ private fun Body(post: PostWithAuthor?, navController: NavController) {
 }
 
 @Composable
-private fun BottonsRow(wellnessTask: Post, liked: () -> Unit) {
+private fun BottonsRow(wellnessTask: PostWithAuthor, liked: () -> Unit) {
     Row(modifier = Modifier.padding(7.dp)) {
         LikeButton(wellnessTask){
             liked()
@@ -129,7 +129,7 @@ private fun Headermy(wellnessTask: PostWithAuthor?) {
             .padding(7.dp)
     ) {
         AsyncImage(
-            model = if (wellnessTask?.author?.avatarUrl.isNullOrEmpty()) painterResource(id = R.drawable.ic_launcher_background) else wellnessTask?.author?.avatarUrl,
+            model = if (wellnessTask?.author?.avatarUrl.isNullOrEmpty())  R.drawable.ic_launcher_background else wellnessTask?.author?.avatarUrl,
             contentDescription = "avatar of author",
             Modifier
                 .clip(shape = CircleShape)

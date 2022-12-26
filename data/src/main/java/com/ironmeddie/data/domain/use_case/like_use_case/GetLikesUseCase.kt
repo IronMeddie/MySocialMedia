@@ -4,5 +4,5 @@ import com.ironmeddie.data.domain.repository.MyRepository
 import javax.inject.Inject
 
 class GetLikesUseCase @Inject constructor(private val repository: MyRepository) {
-    operator fun invoke(postId: String) = repository.getLikes(postId)
+    suspend operator fun invoke(postId: String) = repository.getLikes(postId)
 }

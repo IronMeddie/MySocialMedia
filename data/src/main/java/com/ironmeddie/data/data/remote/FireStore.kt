@@ -93,7 +93,6 @@ class MyFireStore {
                 db.collection(USERS_NODE).document(currentUser).update(UserNodes.username, information.username).await()
             }
             is UserInformationUpdate.Avatar ->{
-                Log.d("checkCode", "AvatarChanging")
              db.collection(USERS_NODE).document(currentUser).update(UserNodes.avatarUrl, information.fileUrl).await()
             }
             is UserInformationUpdate.About ->{
@@ -220,10 +219,9 @@ class MyFireStore {
         db.collection(LIKES_NODE).document(postId).set(data).await()
     }
 
-    fun getLikes(postId: String)= flow {
-        val list = db.collection(LIKES_NODE).document(postId).get().await().toObject<Likes>()?.id ?: emptyList()
-        emit(list)
-    }
+    suspend fun getLikes(postId: String) = db.collection(LIKES_NODE).document(postId).get().await().toObject<Likes>()?.id ?: emptyList()
+
+
 }
 
 sealed class UnicValue {

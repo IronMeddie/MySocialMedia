@@ -12,16 +12,26 @@ class GetPostsUseCase @Inject constructor(private val repository: MyRepository) 
         repository.getUserFriendList().flatMapLatest {
             val list = mutableListOf<String>(repository.getUserId().toString())
             list.addAll(it.Friends)
-                repository.getPosts(list).map { listPosts->
-                    listPosts.sortedByDescending { it.timeStamp }.map { PostWithAuthor(
+            repository.getPosts(list).map { listPosts ->
+                listPosts.sortedByDescending { it.timeStamp }.map {
+                    val likes = repository.getLikes(it.id)
+                        .map { id -> repository.getUserInformation(id) ?: UserInfo() }
+                    PostWithAuthor(
                         post = it,
-                        author = repository.getUserInformation(it.author) ?: UserInfo()
-                    ) }
+                        author = repository.getUserInformation(it.author) ?: UserInfo(),
+                        likes = likes,
+                        liked = likes.firstOrNull { it.id == repository.getUserId() } != null
+                    )
                 }
+            }
         }
+
+
 }
 
 data class PostWithAuthor(
-    val post: Post,
-    val author: UserInfo
+    val post: Post = Post(),
+    val author: UserInfo = UserInfo(),
+    val likes: List<UserInfo> = emptyList(),
+    val liked: Boolean = false
 )

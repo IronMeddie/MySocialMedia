@@ -45,6 +45,6 @@ interface MyRepository {
 
     suspend fun like(postId: String)
 
-    fun getLikes(postId: String): Flow<List<String>>
+    suspend fun getLikes(postId: String): List<String>
 
 }
