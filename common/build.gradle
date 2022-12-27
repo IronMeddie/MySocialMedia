@@ -5,11 +5,11 @@ plugins {
 
 android {
     namespace 'com.ironmeddie.common'
-    compileSdk 33
+    compileSdk sdk.compil
 
     defaultConfig {
-        minSdk 25
-        targetSdk 33
+        minSdk sdk.min
+        targetSdk sdk.target
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -38,26 +38,23 @@ android {
 
 dependencies {
 
+    implementation libs.core_ktx
+    implementation libs.activity_compose
+    testImplementation libs.junit
+    androidTestImplementation libs.test_ext_junit
+    androidTestImplementation libs.espresso
+
+
     //compose
-    def compose = "1.3.1"
-    def nav_version = "2.5.3"
+    implementation libs.navigation
+    implementation libs.viewmodel_compose
+    implementation libs.compose_ui
+    implementation libs.compose_material
+    implementation libs.tooling_preview
+    androidTestImplementation libs.ui_test_junit4
+    debugImplementation libs.ui_tooling
+    debugImplementation libs.ui_test_manifest
+    implementation libs.activity_compose
 
 
-
-    implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
-    implementation "androidx.compose.ui:ui:$compose"
-    implementation "androidx.compose.material:material:$compose"
-    implementation "androidx.compose.ui:ui-tooling-preview:$compose"
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose"
-    debugImplementation "androidx.compose.ui:ui-tooling:$compose"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose"
-    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
-
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.google.android.material:material:1.7.0'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
 }

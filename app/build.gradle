@@ -55,6 +55,12 @@ dependencies {
     implementation project(path: ':common')
     implementation project(path: ':data')
 
+    implementation libs.core_ktx
+    implementation libs.activity_compose
+    testImplementation libs.junit
+    androidTestImplementation libs.test_ext_junit
+    androidTestImplementation libs.espresso
+
     implementation libs.viewmodel_compose
     implementation libs.compose_ui
     implementation libs.compose_material
@@ -63,13 +69,6 @@ dependencies {
     debugImplementation libs.ui_tooling
     debugImplementation libs.ui_test_manifest
     implementation libs.navigation
-
-    implementation libs.core_ktx
-//    implementation libs.lifecycle
-    implementation libs.activity_compose
-    testImplementation libs.junit
-    androidTestImplementation libs.test_ext_junit
-    androidTestImplementation libs.espresso
 
     //coroutines
     implementation libs.coroutines

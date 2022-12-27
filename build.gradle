@@ -55,6 +55,7 @@ buildscript {
 
                 //coroutines
                 coroutines   : ('org.jetbrains.kotlinx:kotlinx-coroutines-android:') + coroutinesVersion,
+                coroutinesCore   : ('org.jetbrains.kotlinx:kotlinx-coroutines-core:') + coroutinesVersion,
 
                 //lifecycle
                 lifecycle   : ('androidx.lifecycle:lifecycle-runtime-ktx:') + lifecycleVersion

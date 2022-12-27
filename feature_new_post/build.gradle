@@ -6,11 +6,11 @@ plugins {
 
 android {
     namespace 'com.ironmeddie.feature_new_post'
-    compileSdk 33
+    compileSdk sdk.compil
 
     defaultConfig {
-        minSdk 25
-        targetSdk 33
+        minSdk sdk.min
+        targetSdk sdk.target
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -45,45 +45,34 @@ dependencies {
     implementation project(path: ':data')
     implementation project(path: ':common')
 
-    //compose
-    def compose = "1.3.1"
-    def nav_version = "2.5.3"
-
-
-
-    implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
-    implementation "androidx.compose.ui:ui:$compose"
-    implementation "androidx.compose.material:material:$compose"
-    implementation "androidx.compose.ui:ui-tooling-preview:$compose"
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose"
-    debugImplementation "androidx.compose.ui:ui-tooling:$compose"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose"
-    implementation 'androidx.activity:activity-compose:1.6.1'
+    implementation libs.core_ktx
+    implementation libs.activity_compose
+    testImplementation libs.junit
+    androidTestImplementation libs.test_ext_junit
+    androidTestImplementation libs.espresso
+    
+//compose
+    implementation libs.navigation
+    implementation libs.viewmodel_compose
+    implementation libs.compose_ui
+    implementation libs.compose_material
+    implementation libs.tooling_preview
+    androidTestImplementation libs.ui_test_junit4
+    debugImplementation libs.ui_tooling
+    debugImplementation libs.ui_test_manifest
+    implementation libs.activity_compose
 
 
     //Icons
-    implementation "androidx.compose.material:material-icons-extended:1.3.1"
+    implementation libs.icons
 
-
-
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.google.android.material:material:1.7.0'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
-
-
-    def hiltVersion = "2.44.2"
-    implementation("com.google.dagger:hilt-android:$hiltVersion")
-    kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
-    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
-
-
+    //hilt
+    implementation libs.hilt
+    kapt libs.hilt_compiler
+    implementation libs.hilt_navigation_compose
 
     //coil
-    implementation 'io.coil-kt:coil-compose:2.2.2'
+    implementation libs.coil
 
     //compressor
 //    implementation 'id.zelory:compressor:3.0.1'
