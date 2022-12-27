@@ -1,7 +1,7 @@
 package com.example.test1.data.db
 
 import androidx.room.*
-import com.ironmeddie.data.models.UserInfo
+import com.ironmeddie.data.domain.models.UserInfo
 
 
 @Dao

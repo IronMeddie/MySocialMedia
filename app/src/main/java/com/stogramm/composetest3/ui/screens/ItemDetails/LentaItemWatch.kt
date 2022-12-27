@@ -24,7 +24,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.ironmeddie.data.domain.use_case.get_posts_use_case.PostWithAuthor
-import com.ironmeddie.data.models.Post
+import com.ironmeddie.data.domain.models.Post
 import com.stogramm.composetest3.R
 import com.stogramm.composetest3.ui.screens.NewsFeed.ListVM
 import com.stogramm.composetest3.ui.screens.NewsFeed.MainScreenState
@@ -130,8 +130,8 @@ private fun Headermy(wellnessTask: PostWithAuthor?) {
     ) {
         AsyncImage(
             model = if (wellnessTask?.author?.avatarUrl.isNullOrEmpty())  R.drawable.ic_launcher_background else wellnessTask?.author?.avatarUrl,
-            contentDescription = "avatar of author",
-            Modifier
+            contentDescription = "avatar of author", contentScale = ContentScale.Crop,
+            modifier = Modifier
                 .clip(shape = CircleShape)
                 .size(54.dp)
         )

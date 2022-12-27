@@ -9,8 +9,8 @@ import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostsUseCase
 import com.ironmeddie.data.domain.use_case.get_posts_use_case.PostWithAuthor
 import com.ironmeddie.data.domain.use_case.like_use_case.GetLikesUseCase
 import com.ironmeddie.data.domain.use_case.like_use_case.LikeUseCase
-import com.ironmeddie.data.models.Post
-import com.ironmeddie.data.models.UserInfo
+import com.ironmeddie.data.domain.models.Post
+import com.ironmeddie.data.domain.models.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*

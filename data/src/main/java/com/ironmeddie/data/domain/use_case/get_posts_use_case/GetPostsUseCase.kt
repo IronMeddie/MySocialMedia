@@ -1,8 +1,8 @@
 package com.ironmeddie.data.domain.use_case.get_posts_use_case
 
 import com.ironmeddie.data.domain.repository.MyRepository
-import com.ironmeddie.data.models.Post
-import com.ironmeddie.data.models.UserInfo
+import com.ironmeddie.data.domain.models.Post
+import com.ironmeddie.data.domain.models.UserInfo
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

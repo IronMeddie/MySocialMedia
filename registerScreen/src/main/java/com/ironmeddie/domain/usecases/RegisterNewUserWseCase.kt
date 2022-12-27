@@ -3,7 +3,7 @@ package com.ironmeddie.domain.usecases
 import androidx.core.text.isDigitsOnly
 import com.ironmeddie.data.data.repository.MyRepositoryImpl
 import com.ironmeddie.data.domain.repository.MyRepository
-import com.ironmeddie.data.models.UserInfo
+import com.ironmeddie.data.domain.models.UserInfo
 import javax.inject.Inject
 
 

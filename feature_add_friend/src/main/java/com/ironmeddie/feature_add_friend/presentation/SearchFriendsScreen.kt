@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.ironmeddie.common.TransparentHintTextField
-import com.ironmeddie.data.models.UserInfo
+import com.ironmeddie.data.domain.models.UserInfo
 
 
 @Composable

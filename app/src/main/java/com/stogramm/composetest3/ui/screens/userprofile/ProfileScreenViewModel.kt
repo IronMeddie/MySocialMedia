@@ -11,8 +11,8 @@ import com.stogramm.composetest3.ui.screens.PhotoWath.get_profile_use_case.GetPr
 import com.stogramm.composetest3.ui.screens.PhotoWath.get_profile_use_case.GetUserFriendsUseCase
 import com.stogramm.composetest3.ui.screens.PhotoWath.get_profile_use_case.GetUserPostsUseCase
 import com.stogramm.composetest3.ui.screens.PhotoWath.get_profile_use_case.UpdateAvatarUseCase
-import com.ironmeddie.data.models.Post
-import com.ironmeddie.data.models.UserInfo
+import com.ironmeddie.data.domain.models.Post
+import com.ironmeddie.data.domain.models.UserInfo
 import com.ironmeddie.domain.usecases.LogOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

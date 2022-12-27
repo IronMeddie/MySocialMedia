@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ironmeddie.data.data.repository.MyRepositoryImpl
-import com.ironmeddie.data.models.UserInfo
+import com.ironmeddie.data.domain.models.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

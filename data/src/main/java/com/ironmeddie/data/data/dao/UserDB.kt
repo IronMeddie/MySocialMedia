@@ -2,7 +2,7 @@ package com.example.test1.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.ironmeddie.data.models.UserInfo
+import com.ironmeddie.data.domain.models.UserInfo
 
 
 @Database(entities = [UserInfo::class], version = 1, exportSchema = true)

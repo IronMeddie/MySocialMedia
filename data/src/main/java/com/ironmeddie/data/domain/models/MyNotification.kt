@@ -1,4 +1,4 @@
-package com.ironmeddie.data.models
+package com.ironmeddie.data.domain.models
 
 import java.util.*
 

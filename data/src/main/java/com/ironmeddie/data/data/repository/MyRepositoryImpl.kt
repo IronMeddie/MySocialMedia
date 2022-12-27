@@ -6,9 +6,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ironmeddie.data.data.remote.*
 import com.ironmeddie.data.domain.repository.MyRepository
-import com.ironmeddie.data.models.MyNotification
-import com.ironmeddie.data.models.Post
-import com.ironmeddie.data.models.UserInfo
+import com.ironmeddie.data.domain.models.MyNotification
+import com.ironmeddie.data.domain.models.Post
+import com.ironmeddie.data.domain.models.UserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*

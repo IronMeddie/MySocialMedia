@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ironmeddie.data.domain.use_case.get_posts_use_case.PostWithAuthor
-import com.ironmeddie.data.models.Post
+import com.ironmeddie.data.domain.models.Post
 import com.ironmeddie.feature_add_friend.navigation.navigateToSearchScreen
 import com.ironmeddie.feature_new_post.presentation.navigation.navigateToNewPostScreen
 import com.stogramm.composetest3.R

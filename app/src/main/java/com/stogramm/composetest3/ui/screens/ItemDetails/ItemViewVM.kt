@@ -2,7 +2,7 @@ package com.stogramm.composetest3.ui.screens.ItemDetails
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.ironmeddie.data.models.Post
+import com.ironmeddie.data.domain.models.Post
 
 
 class ItemViewVM(savedStateHandle: SavedStateHandle) : ViewModel() {

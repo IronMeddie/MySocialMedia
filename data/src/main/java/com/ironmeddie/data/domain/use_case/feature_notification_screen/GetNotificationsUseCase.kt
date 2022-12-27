@@ -2,7 +2,7 @@ package com.ironmeddie.data.domain.use_case.feature_notification_screen
 
 
 import com.ironmeddie.data.domain.repository.MyRepository
-import com.ironmeddie.data.models.UserInfo
+import com.ironmeddie.data.domain.models.UserInfo
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 

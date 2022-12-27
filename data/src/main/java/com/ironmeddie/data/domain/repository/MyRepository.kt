@@ -2,9 +2,9 @@ package com.ironmeddie.data.domain.repository
 
 import android.net.Uri
 import com.ironmeddie.data.data.remote.Friends
-import com.ironmeddie.data.models.MyNotification
-import com.ironmeddie.data.models.Post
-import com.ironmeddie.data.models.UserInfo
+import com.ironmeddie.data.domain.models.MyNotification
+import com.ironmeddie.data.domain.models.Post
+import com.ironmeddie.data.domain.models.UserInfo
 import kotlinx.coroutines.flow.Flow
 
 interface MyRepository {
