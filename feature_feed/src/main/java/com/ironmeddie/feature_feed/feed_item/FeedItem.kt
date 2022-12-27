@@ -1,27 +1,27 @@
 package com.ironmeddie.feature_feed.feed_item
 
+
+import androidx.compose.animation.Animatable
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Comment
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.ironmeddie.data.domain.models.Post
 import com.ironmeddie.data.domain.models.PostWithAuthor
+import com.ironmeddie.feature_feed.R
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -32,9 +32,10 @@ fun FeedItem(
     onClikToAuthor: () -> Unit,
     onClikToBody: () -> Unit,
     onLike: () -> Unit,
-    onClikComment: () -> Unit
+    onClikComment: () -> Unit,
+    onClikShare: () -> Unit,
 ) {
-    Column() {
+    Column(modifier = Modifier.clickable { onClikToBody() }) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -42,7 +43,9 @@ fun FeedItem(
         ) {  // head
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(11.dp)
+                modifier = Modifier
+                    .padding(8.dp)
+                    .clickable { onClikToAuthor() }
             ) {
                 AsyncImage(
                     model = post.author.avatarUrl,
@@ -55,44 +58,68 @@ fun FeedItem(
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = post.author.username ?: "unknown",
-                    style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.body1
                 )
             }
             IconButton(onClick = { /*TODO*/ }, modifier = Modifier.padding(end = 11.dp)) {
                 Icon(imageVector = Icons.Default.MoreVert, contentDescription = "post options")
             }
         }
+
         AsyncImage(
             model = post.post.fileUrl,
             contentDescription = "main content photo",
             modifier = Modifier.fillMaxWidth()
         ) // content
-
-        Row(modifier = Modifier.fillMaxWidth()) {  // buttons: likes, comments
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(imageVector = Icons.Default.FavoriteBorder, contentDescription = "post like")
-            }
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(imageVector = Icons.Default.Comment, contentDescription = "post comment")
-            }
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(imageVector = Icons.Default.Share, contentDescription = "post share")
-            }
-        }
-        Box() {
+        Text(text = post.post.descr, style = MaterialTheme.typography.body1, modifier = Modifier.padding(start = 8.dp, top = 4.dp))
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 8.dp, end = 8.dp, top = 4.dp)) {
+            if (post.likes.isNotEmpty()) Text(
+                modifier = Modifier.align(Alignment.BottomStart),
+                text = "likes " + post.likes.size.toString(),
+                style = MaterialTheme.typography.body2
+            )
             Text(
                 text = post.post.time.toMyStringFormat(),
-                style = MaterialTheme.typography.subtitle1,
-                modifier = Modifier.padding(start = 16.dp)
+                style = MaterialTheme.typography.body2,
+                modifier = Modifier.align(Alignment.BottomEnd)
             )
         }
+
+
+
+
+        Row(modifier = Modifier.fillMaxWidth()) {  // buttons: likes, comments
+
+            val scope = rememberCoroutineScope()
+            val image = if (!post.liked) Icons.Default.FavoriteBorder else Icons.Default.Favorite
+            val targetcolor = Color(0xFFAA2D2D)
+            val initialColor = Color.Black
+            val color = remember { Animatable(initialColor) }
+            IconButton(onClick = {onLike()
+                scope.launch {
+                    color.animateTo(if (!post.liked) targetcolor else initialColor, animationSpec = tween(600))
+
+                }
+                } ){
+                Icon(imageVector = image, contentDescription = "post like", tint = color.value)
+            }
+            IconButton(onClick = onClikComment) {
+                Icon(imageVector = Icons.Default.Comment, contentDescription = "post comment", tint = initialColor)
+            }
+            IconButton(onClick = onClikShare) {
+                Icon(imageVector = Icons.Default.Share, contentDescription = "post share", tint = initialColor)
+            }
+        }
+
 
     }
 }
 
 
 fun LocalDateTime.toMyStringFormat(): String {
-    val format =  DateTimeFormatter.ofPattern("MMMM d',' yyyy hh':'mm ")
+    val format = DateTimeFormatter.ofPattern("MMMM d',' yyyy hh':'mm ")
     return this.format(format) ?: ""
 }
 
@@ -102,5 +129,14 @@ fun LocalDateTime.toMyStringFormat(): String {
 fun PreviewFeedItem() {
     val post =
         PostWithAuthor(post = Post(fileUrl = "https://sun9-86.userapi.com/impg/YtJno0HvVLL5oVtkTkiAAvPWlBXZ_rDCyvNlkg/DsqaxiCtHMQ.jpg?size=967x2160&quality=95&sign=bea27644ea749d10069d674c55d29881&type=album"))
-    FeedItem(post, onClikToAuthor = {}, onClikToBody = {}, onLike = {}, onClikComment = {})
+//    FeedItem(
+//        post,
+//        onClikToAuthor = {},
+//        onClikToBody = {},
+//        onLike = {},
+//        onClikComment = {},
+//        onClikShare = {})
+
 }
+
+

@@ -12,9 +12,15 @@ import com.stogramm.composetest3.R
 val Typography = Typography(
     body1 = TextStyle(
         fontFamily = FontFamily(Font(com.ironmeddie.registerscreen.R.font.open_sans)),
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp
+        fontWeight = FontWeight.Bold,
+        fontSize = 14.sp,
     ),
+    body2 = TextStyle(
+        fontFamily = FontFamily(Font(com.ironmeddie.registerscreen.R.font.open_sans)),
+        fontWeight = FontWeight.Normal,
+        fontSize = 11.sp,
+    ),
+
 
     subtitle1 = TextStyle(
         fontFamily = FontFamily(Font(com.ironmeddie.registerscreen.R.font.open_sans)),

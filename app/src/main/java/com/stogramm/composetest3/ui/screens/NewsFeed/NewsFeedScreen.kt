@@ -12,9 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.ironmeddie.data.data.remote.utils.PostNodes.author
 import com.ironmeddie.data.domain.models.Post
 import com.ironmeddie.data.domain.models.PostWithAuthor
 import com.ironmeddie.data.domain.models.UserInfo
@@ -86,11 +85,17 @@ fun NewsFeedScreen(
                     modifier = Modifier.padding(paddingValues)
                 ) {
                     item {
-                        val post = PostWithAuthor(
-                            post = Post(fileUrl = "https://s1.1zoom.me/big3/147/Waterfalls_Summer_Rivers_Rays_of_light_563524_2800x1874.jpg"),
-                        author = UserInfo(username = "IronMeddie", avatarUrl = "https://selam.org/galeri/?image=Diger/Wet_rocks_1920x1200.jpg")
-                        )
-                        FeedItem(post, onClikToAuthor = {}, onClikToBody = {},onLike = {}, onClikComment= {} )
+                        var post by remember{ mutableStateOf(
+                            PostWithAuthor(
+                                post = Post(fileUrl = "https://s1.1zoom.me/big3/147/Waterfalls_Summer_Rivers_Rays_of_light_563524_2800x1874.jpg", descr = "test description"),
+                                author = UserInfo(username = "IronMeddie", avatarUrl = "https://selam.org/galeri/?image=Diger/Wet_rocks_1920x1200.jpg"),
+                                likes = listOf(
+                                    UserInfo(id = "dsasdsad", username = "user2"),
+                                    UserInfo(id = "dsa", username = "user1")
+                                )
+                            )
+                        ) }
+                        FeedItem(post, onClikToAuthor = {}, onClikToBody = {},onLike = { post = post.copy(liked = !post.liked) }, onClikComment= {} , onClikShare = {})
                     }
                     items(state.data, key = { it.post.id }) { post ->
                         NewsCard(
