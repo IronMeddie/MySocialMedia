@@ -1,5 +1,7 @@
 package com.stogramm.composetest3.ui.screens.NewsFeed
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,13 +27,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.ironmeddie.data.domain.use_case.get_posts_use_case.PostWithAuthor
 import com.ironmeddie.data.domain.models.Post
+import com.ironmeddie.data.domain.models.PostWithAuthor
+import com.ironmeddie.data.domain.models.UserInfo
 import com.ironmeddie.feature_add_friend.navigation.navigateToSearchScreen
+import com.ironmeddie.feature_feed.feed_item.FeedItem
 import com.ironmeddie.feature_new_post.presentation.navigation.navigateToNewPostScreen
 import com.stogramm.composetest3.R
 import com.stogramm.composetest3.ui.utilComposes.LikeButton
 import kotlinx.coroutines.delay
+
 
 
 @Composable
@@ -80,6 +85,13 @@ fun NewsFeedScreen(
                 LazyColumn(
                     modifier = Modifier.padding(paddingValues)
                 ) {
+                    item {
+                        val post = PostWithAuthor(
+                            post = Post(fileUrl = "https://s1.1zoom.me/big3/147/Waterfalls_Summer_Rivers_Rays_of_light_563524_2800x1874.jpg"),
+                        author = UserInfo(username = "IronMeddie", avatarUrl = "https://selam.org/galeri/?image=Diger/Wet_rocks_1920x1200.jpg")
+                        )
+                        FeedItem(post, onClikToAuthor = {}, onClikToBody = {},onLike = {}, onClikComment= {} )
+                    }
                     items(state.data, key = { it.post.id }) { post ->
                         NewsCard(
                             post,
@@ -143,8 +155,10 @@ fun NewsCard(
                     fontSize = 18.sp,
                     fontWeight = FontWeight(600)
                 )
+
+                val time = wellnessTask.post.time.dayOfMonth.toString() +" "+ wellnessTask.post.time.month.toString() + "    " + wellnessTask.post.time.hour.toString() + ":" + wellnessTask.post.time.minute
                 Text(
-                    text = wellnessTask.post.timeStamp.toString(),
+                    text = time,
                     fontSize = 16.sp,
                     fontWeight = FontWeight(300),
                     color = Color.Gray

@@ -1,19 +1,22 @@
 package com.stogramm.composetest3.ui.screens.NewsFeed
 
-import android.util.Log
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ironmeddie.data.data.remote.FirebaseAuthApp
+import com.ironmeddie.data.domain.models.Post
+import com.ironmeddie.data.domain.models.PostWithAuthor
 import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostsUseCase
-import com.ironmeddie.data.domain.use_case.get_posts_use_case.PostWithAuthor
 import com.ironmeddie.data.domain.use_case.like_use_case.GetLikesUseCase
 import com.ironmeddie.data.domain.use_case.like_use_case.LikeUseCase
-import com.ironmeddie.data.domain.models.Post
-import com.ironmeddie.data.domain.models.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

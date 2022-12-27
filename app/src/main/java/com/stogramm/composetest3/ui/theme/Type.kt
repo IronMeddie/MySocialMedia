@@ -14,6 +14,13 @@ val Typography = Typography(
         fontFamily = FontFamily(Font(com.ironmeddie.registerscreen.R.font.open_sans)),
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp
+    ),
+
+    subtitle1 = TextStyle(
+        fontFamily = FontFamily(Font(com.ironmeddie.registerscreen.R.font.open_sans)),
+        fontWeight = FontWeight.Normal,
+        fontSize = 11.sp,
+        color = GreyMain
     )
     /* Other default text styles to override
     button = TextStyle(

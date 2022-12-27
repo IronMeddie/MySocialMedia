@@ -7,9 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bumptech.glide.Glide.init
-import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostByIdUseCase
 import com.ironmeddie.data.domain.models.Post
+import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostByIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch

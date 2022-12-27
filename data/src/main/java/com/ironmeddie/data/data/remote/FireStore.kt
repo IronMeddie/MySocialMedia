@@ -1,6 +1,7 @@
 package com.ironmeddie.data.data.remote
 
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
@@ -16,6 +17,7 @@ import com.ironmeddie.data.domain.models.UserInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import java.time.*
 
 const val USERS_NODE = "users"
 const val POSTS_NODE = "posts"
@@ -61,21 +63,24 @@ class MyFireStore {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun getPosts(authorsId: List<String>) = flow {
-        Log.d("checkCode", "getPosts floe started")
-        val list =
-            db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().map {
-                Post(
-                    id = it.id,
-                    author = it.data["author"].toString(),
-                    timeStamp = (it.data["timeStamp"] as Timestamp).toDate(),
-                    descr = it.data["descr"].toString(),
-                    fileUrl = it.data["fileUrl"].toString()
-                )
-            }
+        val querry = db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().map {
+            Post(
+            id = it.id,
+            author = it.data["author"].toString(),
+            timeStamp = (it.data["timeStamp"] as Timestamp).toDate(),
+            descr = it.data["descr"].toString(),
+            fileUrl = it.data["fileUrl"].toString(),
+            time = Instant.ofEpochSecond((it.data["timeStamp"] as Timestamp).seconds, (it.data["timeStamp"] as Timestamp).nanoseconds.toLong() ).atZone(ZoneId.systemDefault()).toLocalDateTime()
+
+        )
+        }
+
+
 
 //        db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().toObjects(PostDTO::class.java).map { it.toPost() }
-        emit(list)
+        emit(querry)
     }
 
 
