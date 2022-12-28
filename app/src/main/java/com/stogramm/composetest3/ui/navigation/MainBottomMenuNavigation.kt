@@ -9,9 +9,7 @@ import androidx.navigation.navigation
 import com.ironmeddie.feature_notifications.NotificationScreen
 import com.stogramm.composetest3.ui.screens.NewsFeed.ListVM
 import com.stogramm.composetest3.ui.screens.NewsFeed.NewsFeedScreen
-import com.stogramm.composetest3.ui.screens.labudatest.LabudaTest
-import com.stogramm.composetest3.ui.screens.login.navigateToLoginScreen
-import com.stogramm.composetest3.ui.screens.userprofile.UserProfile
+import com.stogramm.composetest3.ui.screens.userprofile.Profile
 
 
 const val mainScreenNavigationRoute = "main_screen_route"
@@ -35,9 +33,7 @@ fun NavGraphBuilder.mainScreen(
             }
         }
         composable(route = userProfileNavigationRoute) {
-            UserProfile(navController) {
-                navController.navigateToLoginScreen()
-            }
+            Profile(navController)
         }
         composable(route = NotificationNavigationRoute) {
             NotificationScreen(navController = navController)
