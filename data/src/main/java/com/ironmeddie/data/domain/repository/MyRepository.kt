@@ -41,7 +41,7 @@ interface MyRepository {
 
     fun getPostById(id: String): Flow<Post>
 
-    fun loadAvatar(uri: Uri)
+    suspend fun loadAvatar(uri: Uri)
 
     suspend fun like(postId: String)
 

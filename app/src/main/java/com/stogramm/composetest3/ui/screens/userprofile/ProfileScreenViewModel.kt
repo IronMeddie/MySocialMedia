@@ -13,6 +13,7 @@ import com.stogramm.composetest3.ui.screens.PhotoWath.get_profile_use_case.GetUs
 import com.stogramm.composetest3.ui.screens.PhotoWath.get_profile_use_case.UpdateAvatarUseCase
 import com.ironmeddie.data.domain.models.Post
 import com.ironmeddie.data.domain.models.UserInfo
+import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostsUseCase
 import com.ironmeddie.domain.usecases.LogOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,13 +24,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileScreenViewModel @Inject constructor(private val logOutUseCase: LogOutUseCase,
-                                                 private val getUserInfoUseCase: GetUserPostsUseCase,
-                                                 private val getProfileInfoUseCase: GetProfileInfoUseCase,
-                                                 private val updateAvatarUseCase: UpdateAvatarUseCase,
-                                                 private val getFriends: GetUserFriendsUseCase,
+class ProfileScreenViewModel @Inject constructor(
+    private val getPosts: GetPostsUseCase,
+    private val logOutUseCase: LogOutUseCase,
+    private val getUserInfoUseCase: GetUserPostsUseCase,
+    private val getProfileInfoUseCase: GetProfileInfoUseCase,
+    private val updateAvatarUseCase: UpdateAvatarUseCase,
+    private val getFriends: GetUserFriendsUseCase,
 
-                                                 ) :ViewModel() {
+    ) : ViewModel() {
 
 
     private val _state = MutableStateFlow(ProfileState())
@@ -39,14 +42,14 @@ class ProfileScreenViewModel @Inject constructor(private val logOutUseCase: LogO
         getUserInfo()
     }
 
-    fun logOut(){
+    fun logOut() {
         viewModelScope.launch {
             logOutUseCase.execute()
         }
     }
 
     fun getUserInfo() {
-        // вероятно стоит объединить эти потоки ? хз пока пишу тавк потом буду исправлять как всегда
+        // вероятно стоит объединить эти потоки ? хз пока пишу так потом буду исправлять как всегда
         getUserInfoUseCase().onEach {
             _state.value = state.value.copy(posts = it.toMutableStateList())
         }.launchIn(viewModelScope)
@@ -58,8 +61,10 @@ class ProfileScreenViewModel @Inject constructor(private val logOutUseCase: LogO
         }.launchIn(viewModelScope)
     }
 
-    fun updateAvatar(uri: Uri){
-        updateAvatarUseCase(uri)
+    fun updateAvatar(uri: Uri) {
+        viewModelScope.launch {
+            updateAvatarUseCase(uri)
+        }
     }
 }
 

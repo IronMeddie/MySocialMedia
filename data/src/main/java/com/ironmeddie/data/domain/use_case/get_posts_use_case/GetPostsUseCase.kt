@@ -8,24 +8,46 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetPostsUseCase @Inject constructor(private val repository: MyRepository) {
-    operator fun invoke() =
+
+    sealed class PostOption {
+        object UserPosts : PostOption()
+        object Feed : PostOption()
+    }
+
+
+    operator fun invoke(option: PostOption = PostOption.Feed) =if(option is PostOption.Feed){
         repository.getUserFriendList().flatMapLatest {
-            val list = mutableListOf<String>(repository.getUserId().toString())
-            list.addAll(it.Friends)
-            repository.getPosts(list).map { listPosts ->
-                listPosts.sortedByDescending { it.timeStamp }.map {
-                    val likes = repository.getLikes(it.id)
-                        .map { id -> repository.getUserInformation(id) ?: UserInfo() }
-                    PostWithAuthor(
-                        post = it,
-                        author = repository.getUserInformation(it.author) ?: UserInfo(),
-                        likes = likes,
-                        liked = likes.firstOrNull { it.id == repository.getUserId() } != null
-                    )
+                val list = mutableListOf(repository.getUserId().toString())
+                list.addAll(it.Friends)
+                repository.getPosts(list).map { posts ->
+                    posts.sortedByDescending { it.time }.map { post -> PostWithAuthor(
+                    post = post,
+                    author = repository.getUserInformation(post.author) ?: UserInfo(),
+                    likes = repository.getLikes(post.id)
+                        .map { id -> repository.getUserInformation(id) ?: UserInfo() },
+                    liked = repository.getUserId() in repository.getLikes(post.id)
+                ) }
                 }
             }
+    }else{
+        repository.getPosts(listOf(repository.getUserId().toString())).map { posts ->
+            posts.sortedByDescending { it.time }.map { post -> PostWithAuthor(
+                post = post,
+                author = repository.getUserInformation(post.author) ?: UserInfo(),
+                likes = repository.getLikes(post.id)
+                    .map { id -> repository.getUserInformation(id) ?: UserInfo() },
+                liked = repository.getUserId() in repository.getLikes(post.id)
+            ) }
         }
+    }
+
 
 
 }
+
+
+
+
+
+
 

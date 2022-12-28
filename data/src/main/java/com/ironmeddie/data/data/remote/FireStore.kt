@@ -1,7 +1,5 @@
 package com.ironmeddie.data.data.remote
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
@@ -63,7 +61,7 @@ class MyFireStore {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
     fun getPosts(authorsId: List<String>) = flow {
         val querry = db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().map {
             Post(
@@ -77,9 +75,6 @@ class MyFireStore {
         )
         }
 
-
-
-//        db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().toObjects(PostDTO::class.java).map { it.toPost() }
         emit(querry)
     }
 

@@ -3,6 +3,7 @@ package com.ironmeddie.feature_feed.feed_item
 
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -20,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.ironmeddie.data.domain.models.Post
 import com.ironmeddie.data.domain.models.PostWithAuthor
-import com.ironmeddie.feature_feed.R
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 
 @Composable
@@ -53,7 +54,7 @@ fun FeedItem(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(40.dp)
-                        .clip(CircleShape)
+                        .clip(CircleShape).border(1.dp, Color.Black, CircleShape),
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
@@ -69,9 +70,10 @@ fun FeedItem(
         AsyncImage(
             model = post.post.fileUrl,
             contentDescription = "main content photo",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            contentScale = ContentScale.FillWidth
         ) // content
-        Text(text = post.post.descr, style = MaterialTheme.typography.body1, modifier = Modifier.padding(start = 8.dp, top = 4.dp))
+        Text(text = post.post.descr, style = MaterialTheme.typography.body1, modifier = Modifier.padding(start = 8.dp, top = 4.dp), maxLines = 3)
         Box(modifier = Modifier
             .fillMaxWidth()
             .padding(start = 8.dp, end = 8.dp, top = 4.dp)) {
@@ -119,7 +121,7 @@ fun FeedItem(
 
 
 fun LocalDateTime.toMyStringFormat(): String {
-    val format = DateTimeFormatter.ofPattern("MMMM d',' yyyy hh':'mm ")
+    val format = DateTimeFormatter.ofPattern("MMMM d',' yyyy hh':'mm", Locale.getDefault())
     return this.format(format) ?: ""
 }
 

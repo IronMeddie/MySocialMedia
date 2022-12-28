@@ -25,9 +25,9 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.ironmeddie.data.domain.models.Post
 import com.ironmeddie.data.domain.models.PostWithAuthor
+import com.ironmeddie.data.domain.utils.DataState
 import com.stogramm.composetest3.R
 import com.stogramm.composetest3.ui.screens.NewsFeed.ListVM
-import com.stogramm.composetest3.ui.screens.NewsFeed.MainScreenState
 import com.stogramm.composetest3.ui.screens.PhotoWath.photoViewerRoute
 import com.stogramm.composetest3.ui.utilComposes.LikeButton
 
@@ -38,7 +38,7 @@ const val ItemViewerScreenRoute = "Item_viewer_route"
 fun LentaItemWatch(newsID : String?, vs: ListVM,navController: NavController, liked: (wellnessTask: Post) -> Unit) {
 
     val state = vs.tasks.collectAsState().value
-    val wellnessTask =  if (state is MainScreenState.Success) state.data.firstOrNull{ it?.post?.id == newsID } ?: PostWithAuthor() else PostWithAuthor()
+    val wellnessTask =  if (state is DataState.Success) state.data.firstOrNull{ it.post.id == newsID } ?: PostWithAuthor() else PostWithAuthor()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { pad ->
         LazyColumn(

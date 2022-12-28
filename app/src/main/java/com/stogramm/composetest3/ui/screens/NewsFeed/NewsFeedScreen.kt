@@ -1,7 +1,5 @@
 package com.stogramm.composetest3.ui.screens.NewsFeed
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,17 +23,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.ironmeddie.data.data.remote.utils.PostNodes.author
 import com.ironmeddie.data.domain.models.Post
 import com.ironmeddie.data.domain.models.PostWithAuthor
-import com.ironmeddie.data.domain.models.UserInfo
+import com.ironmeddie.data.domain.utils.DataState
 import com.ironmeddie.feature_add_friend.navigation.navigateToSearchScreen
 import com.ironmeddie.feature_feed.feed_item.FeedItem
 import com.ironmeddie.feature_new_post.presentation.navigation.navigateToNewPostScreen
 import com.stogramm.composetest3.R
+import com.stogramm.composetest3.ui.screens.ItemDetails.navigateToItemDetails
 import com.stogramm.composetest3.ui.utilComposes.LikeButton
 import kotlinx.coroutines.delay
-
 
 
 @Composable
@@ -51,7 +48,7 @@ fun NewsFeedScreen(
         ListVM.getNews()
     }
     when (state) {
-        is MainScreenState.Success -> {
+        is DataState.Success -> {
             Scaffold(
                 topBar = {
                     Row(
@@ -84,35 +81,43 @@ fun NewsFeedScreen(
                 LazyColumn(
                     modifier = Modifier.padding(paddingValues)
                 ) {
-                    item {
-                        var post by remember{ mutableStateOf(
-                            PostWithAuthor(
-                                post = Post(fileUrl = "https://s1.1zoom.me/big3/147/Waterfalls_Summer_Rivers_Rays_of_light_563524_2800x1874.jpg", descr = "test description"),
-                                author = UserInfo(username = "IronMeddie", avatarUrl = "https://selam.org/galeri/?image=Diger/Wet_rocks_1920x1200.jpg"),
-                                likes = listOf(
-                                    UserInfo(id = "dsasdsad", username = "user2"),
-                                    UserInfo(id = "dsa", username = "user1")
-                                )
-                            )
-                        ) }
-                        FeedItem(post, onClikToAuthor = {}, onClikToBody = {},onLike = { post = post.copy(liked = !post.liked) }, onClikComment= {} , onClikShare = {})
-                    }
+//                    item {
+//                        var post by remember{ mutableStateOf(
+//                            PostWithAuthor(
+//                                post = Post(fileUrl = "https://s1.1zoom.me/big3/147/Waterfalls_Summer_Rivers_Rays_of_light_563524_2800x1874.jpg", descr = "test description"),
+//                                author = UserInfo(username = "IronMeddie", avatarUrl = "https://selam.org/galeri/?image=Diger/Wet_rocks_1920x1200.jpg"),
+//                                likes = listOf(
+//                                    UserInfo(id = "dsasdsad", username = "user2"),
+//                                    UserInfo(id = "dsa", username = "user1")
+//                                )
+//                            )
+//                        ) }
+//                        FeedItem(post, onClikToAuthor = {}, onClikToBody = {},onLike = { post = post.copy(liked = !post.liked) }, onClikComment= {} , onClikShare = {})
+//                    }
+
                     items(state.data, key = { it.post.id }) { post ->
-                        NewsCard(
-                            post,
-                            { ListVM.liked(post.post) },
-                            { },
-                            { view(it) })
+                        var news by remember{ mutableStateOf( post )}
+                        FeedItem(news,
+                            onClikToAuthor = {},
+                            onClikToBody = { navController.navigateToItemDetails(post.post.id) },
+                            onLike = { news = news.copy(liked = !news.liked) },
+                            onClikComment= {} ,
+                            onClikShare = {})
+//                        NewsCard(
+//                            post,
+//                            { ListVM.liked(post.post) },
+//                            { },
+//                            { view(it) })
                     }
                 }
             }
         }
-        is MainScreenState.Loading -> {
+        is DataState.Loading -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
-        is MainScreenState.Error -> {
+        is DataState.Error -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(text = state.message)
             }

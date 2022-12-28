@@ -5,7 +5,7 @@ import com.ironmeddie.data.domain.repository.MyRepository
 import javax.inject.Inject
 
 class UpdateAvatarUseCase @Inject constructor(private val repository: MyRepository) {
-    operator fun invoke(uri: Uri){
+    suspend operator fun invoke(uri: Uri){
         repository.loadAvatar(uri)
     }
 }

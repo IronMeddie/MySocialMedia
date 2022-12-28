@@ -11,6 +11,7 @@ import com.ironmeddie.data.domain.models.PostWithAuthor
 import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostsUseCase
 import com.ironmeddie.data.domain.use_case.like_use_case.GetLikesUseCase
 import com.ironmeddie.data.domain.use_case.like_use_case.LikeUseCase
+import com.ironmeddie.data.domain.utils.DataState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +29,7 @@ class ListVM @Inject constructor(
     private val getLikesUseCase: GetLikesUseCase
 
     ) : ViewModel() {
-    private var _tasks = MutableStateFlow<MainScreenState>(MainScreenState.Loading)
+    private var _tasks = MutableStateFlow<DataState<List<PostWithAuthor>>>(DataState.Loading)
     val tasks get() = _tasks
 
     var loginState: Boolean? by mutableStateOf(null)
@@ -65,12 +66,10 @@ class ListVM @Inject constructor(
         if (loginState == true) {
             job?.cancel()
             job = getPosts().onEach {
-                _tasks.value = MainScreenState.Success(data = it)
-            }.catch { e ->
-                _tasks.value = MainScreenState.Error(e.message.toString())
+                _tasks.value = DataState.Success(it)
             }.launchIn(viewModelScope)
         } else {
-            _tasks.value = MainScreenState.Error("login state is not true")
+            _tasks.value = DataState.Error("login state is not true")
         }
     }
 
@@ -83,9 +82,5 @@ class ListVM @Inject constructor(
 }
 
 
-sealed class MainScreenState {
-    object Loading : MainScreenState()
-    data class Success(val data: List<PostWithAuthor>) : MainScreenState()
-    data class Error(val message: String) : MainScreenState()
-}
+
 

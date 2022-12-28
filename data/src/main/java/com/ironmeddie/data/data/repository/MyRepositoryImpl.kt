@@ -39,27 +39,27 @@ class MyRepositoryImpl @Inject constructor(
     }
 
     override suspend fun registration(user: UserInfo, password: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val id = firebaseAuthApp.registerNew(
-                email = user.email ?: return@launch,
-                password = password
-            )
-            if (id != null) {
-                userid = id
-                val newUser = user.copy(id = id)
-                firestore.addNewUser(newUser)
-            }
+
+        val id = firebaseAuthApp.registerNew(
+            email = user.email ?: return,
+            password = password
+        )
+        if (id != null) {
+            userid = id
+            val newUser = user.copy(id = id)
+            firestore.addNewUser(newUser)
         }
+
     }
 
     override suspend fun newPost(fileUri: Uri, description: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val postId = firestore.newPost(description)
-            storage.setFileToStorage(fileUri, FirebaseStorageApp.FileType.PostMedia, postId)
-                .collectLatest {
-                    firestore.updatePostLink(it, postId)
-                }
-        }
+
+        val postId = firestore.newPost(description)
+        storage.setFileToStorage(fileUri, FirebaseStorageApp.FileType.PostMedia, postId)
+            .collectLatest {
+                firestore.updatePostLink(it, postId)
+            }
+
     }
 
     override fun getUserId() = Firebase.auth.currentUser?.uid
@@ -84,15 +84,12 @@ class MyRepositoryImpl @Inject constructor(
 
     override fun getPostById(id: String): Flow<Post> = firestore.getPostById(id)
 
-    override fun loadAvatar(uri: Uri) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val currentUser = getUserId() ?: ""
-            storage.setFileToStorage(uri, FirebaseStorageApp.FileType.UserAvatar, currentUser)
-                .collect() {
-                    firestore.updateUserInformation(UserInformationUpdate.Avatar(it))
-                }
-        }
-
+    override suspend fun loadAvatar(uri: Uri) {
+        val currentUser = getUserId() ?: ""
+        storage.setFileToStorage(uri, FirebaseStorageApp.FileType.UserAvatar, currentUser)
+            .collect() {
+                firestore.updateUserInformation(UserInformationUpdate.Avatar(it))
+            }
 
     }
 
