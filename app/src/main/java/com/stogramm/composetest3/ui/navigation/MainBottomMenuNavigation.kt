@@ -1,14 +1,13 @@
 package com.stogramm.composetest3.ui.navigation
 
 
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.navigation
 import com.ironmeddie.feature_notifications.NotificationScreen
 import com.stogramm.composetest3.ui.screens.NewsFeed.ListVM
 import com.stogramm.composetest3.ui.screens.NewsFeed.NewsFeedScreen
+import com.stogramm.composetest3.ui.screens.PhotoWath.PhotoWatch
+import com.stogramm.composetest3.ui.screens.PhotoWath.photoViewerRoute
 import com.stogramm.composetest3.ui.screens.userprofile.Profile
 
 
@@ -32,9 +31,13 @@ fun NavGraphBuilder.mainScreen(
                 onNavigateToDetails(it.id)
             }
         }
-        composable(route = userProfileNavigationRoute) {
+        composable(route = userProfileNavigationRoute + "?id={id}", arguments =  listOf(
+            navArgument(name = "id"){
+                type = NavType.StringType
+                defaultValue = "" })) {
             Profile(navController)
         }
+
         composable(route = NotificationNavigationRoute) {
             NotificationScreen(navController = navController)
         }

@@ -25,7 +25,7 @@ interface MyRepository {
 
     fun getUserId() :String?
 
-    fun getUserFriendList() : Flow<Friends>
+    fun getUserFriendList(id: String? = null) : Flow<Friends>
 
     suspend fun getUserInformation(id: String) : UserInfo?
 
@@ -46,5 +46,7 @@ interface MyRepository {
     suspend fun like(postId: String)
 
     suspend fun getLikes(postId: String): List<String>
+
+    suspend fun deletePost(id: String)
 
 }

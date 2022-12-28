@@ -37,8 +37,10 @@ fun Profile(navController: NavController, viewModel: ProfileViewModel = hiltView
                     onClikToAuthor = { /*TODO*/ },
                     onClikToBody = { navController.navigateToItemDetails(post.post.id) },
                     onLike = { /*TODO*/ },
-                    onClikComment = { /*TODO*/ }) {
-                }
+                    onClikComment = { /*TODO*/ },
+                    onClikDelete = {viewModel.deletePosto(post.post.id)},
+                    onClikShare = {/*TODO*/}
+                )
             }
         }
     }

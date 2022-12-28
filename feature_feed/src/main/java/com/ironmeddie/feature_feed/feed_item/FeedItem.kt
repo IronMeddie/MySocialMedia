@@ -35,6 +35,7 @@ fun FeedItem(
     onLike: () -> Unit,
     onClikComment: () -> Unit,
     onClikShare: () -> Unit,
+    onClikDelete: () -> Unit,
 ) {
     Column(modifier = Modifier.clickable { onClikToBody() }) {
         Row(
@@ -54,7 +55,8 @@ fun FeedItem(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(40.dp)
-                        .clip(CircleShape).border(1.dp, Color.Black, CircleShape),
+                        .clip(CircleShape)
+                        .border(1.dp, Color.Black, CircleShape),
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
@@ -62,8 +64,18 @@ fun FeedItem(
                     style = MaterialTheme.typography.body1
                 )
             }
-            IconButton(onClick = { /*TODO*/ }, modifier = Modifier.padding(end = 11.dp)) {
+            // todo проверить на авторство пост дабы функция удаления была только у автора
+            var expanded by remember { mutableStateOf(false) }
+            IconButton(onClick = { expanded = !expanded }, modifier = Modifier.padding(end = 11.dp)) {
                 Icon(imageVector = Icons.Default.MoreVert, contentDescription = "post options")
+                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    DropdownMenuItem(onClick = {
+                        onClikDelete()
+                        expanded = !expanded
+                    }) {
+                        Text(text = "Delete post")
+                    }
+                }
             }
         }
 

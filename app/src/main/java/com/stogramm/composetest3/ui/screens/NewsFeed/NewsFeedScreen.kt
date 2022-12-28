@@ -31,6 +31,7 @@ import com.ironmeddie.feature_feed.feed_item.FeedItem
 import com.ironmeddie.feature_new_post.presentation.navigation.navigateToNewPostScreen
 import com.stogramm.composetest3.R
 import com.stogramm.composetest3.ui.screens.ItemDetails.navigateToItemDetails
+import com.stogramm.composetest3.ui.screens.userprofile.navigateToProfile
 import com.stogramm.composetest3.ui.utilComposes.LikeButton
 import kotlinx.coroutines.delay
 
@@ -81,33 +82,18 @@ fun NewsFeedScreen(
                 LazyColumn(
                     modifier = Modifier.padding(paddingValues)
                 ) {
-//                    item {
-//                        var post by remember{ mutableStateOf(
-//                            PostWithAuthor(
-//                                post = Post(fileUrl = "https://s1.1zoom.me/big3/147/Waterfalls_Summer_Rivers_Rays_of_light_563524_2800x1874.jpg", descr = "test description"),
-//                                author = UserInfo(username = "IronMeddie", avatarUrl = "https://selam.org/galeri/?image=Diger/Wet_rocks_1920x1200.jpg"),
-//                                likes = listOf(
-//                                    UserInfo(id = "dsasdsad", username = "user2"),
-//                                    UserInfo(id = "dsa", username = "user1")
-//                                )
-//                            )
-//                        ) }
-//                        FeedItem(post, onClikToAuthor = {}, onClikToBody = {},onLike = { post = post.copy(liked = !post.liked) }, onClikComment= {} , onClikShare = {})
-//                    }
 
                     items(state.data, key = { it.post.id }) { post ->
-                        var news by remember{ mutableStateOf( post )}
+                        var news by remember { mutableStateOf(post) }
                         FeedItem(news,
-                            onClikToAuthor = {},
+                            onClikToAuthor = { navController.navigateToProfile(post.author.id) },
                             onClikToBody = { navController.navigateToItemDetails(post.post.id) },
                             onLike = { news = news.copy(liked = !news.liked) },
-                            onClikComment= {} ,
-                            onClikShare = {})
-//                        NewsCard(
-//                            post,
-//                            { ListVM.liked(post.post) },
-//                            { },
-//                            { view(it) })
+                            onClikComment = {},
+                            onClikShare = {},
+                            onClikDelete = {
+                                ListVM.deletePost(post.post.id)
+                            })
                     }
                 }
             }
@@ -166,7 +152,8 @@ fun NewsCard(
                     fontWeight = FontWeight(600)
                 )
 
-                val time = wellnessTask.post.time.dayOfMonth.toString() +" "+ wellnessTask.post.time.month.toString() + "    " + wellnessTask.post.time.hour.toString() + ":" + wellnessTask.post.time.minute
+                val time =
+                    wellnessTask.post.time.dayOfMonth.toString() + " " + wellnessTask.post.time.month.toString() + "    " + wellnessTask.post.time.hour.toString() + ":" + wellnessTask.post.time.minute
                 Text(
                     text = time,
                     fontSize = 16.sp,

@@ -12,13 +12,16 @@ class FirebaseStorageApp {
     private val storageRef = storage.getReference()
 
 
-    suspend fun setFileToStorage(uri: Uri, fileType: FileType, postId: String) =
-        flow {
-            val path = storageRef.child(fileType.node).child(postId)
-            path.putFile(uri).await()
-            val url = path.downloadUrl.await()
-            emit(url.toString())
-        }
+    suspend fun setFileToStorage(uri: Uri, fileType: FileType, postId: String): String {
+        val path = storageRef.child(fileType.node).child(postId)
+        path.putFile(uri).await()
+        val url = path.downloadUrl.await()
+        return url.toString()
+    }
+
+    suspend fun deletePostMedia(id: String){
+        storageRef.child(FileType.PostMedia.node).child(id).delete()
+    }
 
 
     sealed class FileType(val node: String) {

@@ -79,7 +79,6 @@ class MyFireStore {
     }
 
 
-    suspend fun deletePost(id: String) = db.collection("posts").document(id).delete().await()
 
     suspend fun updatePostLink(url: String, postId: String) {
         db.collection(POSTS_NODE).document(postId).update(PostNodes.fileUrl, url).await()
@@ -181,9 +180,8 @@ class MyFireStore {
 
 
     @Throws(NoAuthExeption::class)
-    fun getFriendsList(): Flow<Friends> {
-        val currentUser =
-            Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("getNotifications failure")
+    fun getFriendsList(id: String? = null): Flow<Friends> {
+        val currentUser = if (id?.isNotBlank() == true) id else Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("getNotifications failure")
         return flow {
             val list = db.collection(FRIENDS_NODE).document(currentUser).get().await()
                 .toObject(Friends::class.java)
@@ -221,6 +219,11 @@ class MyFireStore {
     }
 
     suspend fun getLikes(postId: String) = db.collection(LIKES_NODE).document(postId).get().await().toObject<Likes>()?.id ?: emptyList()
+
+
+    suspend fun deletePost(id: String){
+        db.collection(POSTS_NODE).document(id).delete().await()
+    }
 
 
 }

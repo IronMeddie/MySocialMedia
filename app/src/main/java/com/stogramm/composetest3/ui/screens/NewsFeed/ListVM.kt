@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.ironmeddie.data.data.remote.FirebaseAuthApp
 import com.ironmeddie.data.domain.models.Post
 import com.ironmeddie.data.domain.models.PostWithAuthor
+import com.ironmeddie.data.domain.use_case.delete_post.DeletePostUseCase
 import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostsUseCase
 import com.ironmeddie.data.domain.use_case.like_use_case.GetLikesUseCase
 import com.ironmeddie.data.domain.use_case.like_use_case.LikeUseCase
@@ -26,7 +27,8 @@ class ListVM @Inject constructor(
     private val cauth: FirebaseAuthApp,
     private val getPosts: GetPostsUseCase,
     private val likeUseCase: LikeUseCase,
-    private val getLikesUseCase: GetLikesUseCase
+    private val getLikesUseCase: GetLikesUseCase,
+    private val deletePostUseCase: DeletePostUseCase
 
     ) : ViewModel() {
     private var _tasks = MutableStateFlow<DataState<List<PostWithAuthor>>>(DataState.Loading)
@@ -42,17 +44,11 @@ class ListVM @Inject constructor(
         getNews()
     }
 
-
     fun checkAuth() {
         viewModelScope.launch {
             loginState = cauth.checkAuth()
         }
     }
-
-    fun remove(item: Post) {
-//        _tasks.remove(item)
-    }
-
 
     fun liked(item: Post) {
         viewModelScope.launch {
@@ -60,7 +56,6 @@ class ListVM @Inject constructor(
         }
         getNews()
     }
-
 
     fun getNews() {
         if (loginState == true) {
@@ -71,6 +66,13 @@ class ListVM @Inject constructor(
         } else {
             _tasks.value = DataState.Error("login state is not true")
         }
+    }
+
+    fun deletePost(id:String){
+        viewModelScope.launch {
+            deletePostUseCase(id)
+        }
+        getNews()
     }
 
 

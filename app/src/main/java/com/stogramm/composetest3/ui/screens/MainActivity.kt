@@ -1,7 +1,6 @@
 package com.stogramm.composetest3.ui.screens
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,37 +11,32 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.get
 import androidx.navigation.navArgument
 import com.ironmeddie.data.data.utils.Const
 import com.ironmeddie.feature_add_friend.navigation.searchFriendsScreen
 import com.ironmeddie.feature_new_post.presentation.navigation.newPostScreen
 import com.stogramm.composetest3.context
 import com.stogramm.composetest3.ui.navigation.*
-import com.stogramm.composetest3.ui.navigation.bottomNavigationMenu.bottombar
+import com.stogramm.composetest3.ui.navigation.bottomNavigationMenu.BottomNavigation
 import com.stogramm.composetest3.ui.screens.ItemDetails.ItemViewerScreenRoute
 import com.stogramm.composetest3.ui.screens.ItemDetails.LentaItemWatch
 import com.stogramm.composetest3.ui.screens.NewsFeed.ListVM
 import com.stogramm.composetest3.ui.screens.PhotoWath.PhotoWatch
 import com.stogramm.composetest3.ui.screens.PhotoWath.photoViewerRoute
-import com.stogramm.composetest3.ui.screens.login.loginMainHost
 import com.stogramm.composetest3.ui.screens.login.loginScreen
 import com.stogramm.composetest3.ui.screens.login.navigateToLoginScreen
 import com.stogramm.composetest3.ui.screens.splash.Splash
 import com.stogramm.composetest3.ui.screens.splash.navigateToSplash
 import com.stogramm.composetest3.ui.theme.Composetest3Theme
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 
 
 @AndroidEntryPoint
@@ -78,22 +72,11 @@ fun MainNavHost(views: ListVM = hiltViewModel()) {
 
         Scaffold(bottomBar = {
             if (bottombar) {
-                bottombar(navController) {
-                    navController.navigate(it) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
+                BottomNavigation(navController)
             }
         }, modifier = Modifier.fillMaxSize()) { innerPadding ->
             LaunchedEffect(key1 = true) {
 
-
-                // loginstate can be a mark, that all is good. We can make it true only after download few posts for example or after updating user information from server
-//todo
                 if (views.loginState == false) {
                     navController.navigateToLoginScreen()
                 }else if (views.loginState == null){

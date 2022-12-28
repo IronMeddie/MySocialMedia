@@ -1,11 +1,13 @@
 package com.stogramm.composetest3.ui.screens.userprofile
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ironmeddie.data.data.remote.Friends
 import com.ironmeddie.data.domain.models.PostWithAuthor
 import com.ironmeddie.data.domain.models.UserInfo
+import com.ironmeddie.data.domain.use_case.delete_post.DeletePostUseCase
 import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostsUseCase
 import com.ironmeddie.data.domain.utils.DataState
 import com.ironmeddie.domain.usecases.LogOutUseCase
@@ -27,7 +29,10 @@ class ProfileViewModel @Inject constructor(
     private val logOutUseCase: LogOutUseCase,
     private val getProfileInfoUseCase: GetProfileInfoUseCase,
     private val updateAvatarUseCase: UpdateAvatarUseCase,
-    private val getFriends: GetUserFriendsUseCase
+    private val deletePostUseCase: DeletePostUseCase,
+    private val getFriends: GetUserFriendsUseCase,
+
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
 //
@@ -47,7 +52,10 @@ class ProfileViewModel @Inject constructor(
 
     private var profile = ProfileState()
 
+    private var profileId : String? = null
+
     init {
+        profileId = savedStateHandle.get<String>("id")
         loadUserInfo()
         loadFriends()
         loadPosts()
@@ -55,7 +63,7 @@ class ProfileViewModel @Inject constructor(
 
     fun loadPosts() {
         job?.cancel()
-        job = getPosts(GetPostsUseCase.PostOption.UserPosts).onEach {
+        job = getPosts(GetPostsUseCase.PostOption.UserPosts(profileId)).onEach {
 //            _posts.value = DataState.Success(it)
             profile = profile.copy(posts = it)
             _state.value = DataState.Success(profile)
@@ -63,7 +71,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun loadUserInfo() {
-        getProfileInfoUseCase().onEach {
+        getProfileInfoUseCase(profileId).onEach {
 //            _user.value = DataState.Success(it)
             profile = profile.copy(user = it)
             _state.value = DataState.Success(profile)
@@ -83,13 +91,18 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun loadFriends(){
-        getFriends().onEach {
+        getFriends(profileId).onEach {
 //            _friends.value = DataState.Success(it)
             profile = profile.copy(friends = it)
             _state.value = DataState.Success(profile)
         }.launchIn(viewModelScope)
     }
 
+    fun deletePosto(id: String){
+        viewModelScope.launch {
+            deletePostUseCase(id)
+        }
+    }
 
 }
 

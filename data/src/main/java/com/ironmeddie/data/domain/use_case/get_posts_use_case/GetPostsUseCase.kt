@@ -30,7 +30,8 @@ class GetPostsUseCase @Inject constructor(private val repository: MyRepository) 
             }
         }
     } else {
-        repository.getPosts(listOf(repository.getUserId().toString())).map { posts ->
+        val list = if (option is PostOption.UserPosts && option.id?.isNotBlank() == true) listOf<String>(option.id) else listOf(repository.getUserId().toString())
+        repository.getPosts(list).map { posts ->
             posts.sortedByDescending { it.time }.map { post ->
                 PostWithAuthor(
                     post = post,
@@ -44,7 +45,7 @@ class GetPostsUseCase @Inject constructor(private val repository: MyRepository) 
     }
 
     sealed class PostOption {
-        object UserPosts : PostOption()
+        data class UserPosts(val id: String? = null) : PostOption()
         object Feed : PostOption()
     }
 

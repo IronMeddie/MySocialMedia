@@ -1,17 +1,18 @@
 package com.ironmeddie.data.data.repository
 
 import android.net.Uri
+import android.util.Log
 import com.example.test1.data.db.UserDao
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ironmeddie.data.data.remote.*
-import com.ironmeddie.data.domain.repository.MyRepository
 import com.ironmeddie.data.domain.models.MyNotification
 import com.ironmeddie.data.domain.models.Post
 import com.ironmeddie.data.domain.models.UserInfo
+import com.ironmeddie.data.domain.repository.MyRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,32 +40,31 @@ class MyRepositoryImpl @Inject constructor(
     }
 
     override suspend fun registration(user: UserInfo, password: String) {
-
-        val id = firebaseAuthApp.registerNew(
-            email = user.email ?: return,
-            password = password
-        )
-        if (id != null) {
-            userid = id
-            val newUser = user.copy(id = id)
-            firestore.addNewUser(newUser)
+        CoroutineScope(Dispatchers.IO).launch {
+            val id = firebaseAuthApp.registerNew(
+                email = user.email ?: return@launch,
+                password = password
+            )
+            if (id != null) {
+                userid = id
+                val newUser = user.copy(id = id)
+                firestore.addNewUser(newUser)
+            }
         }
-
     }
 
     override suspend fun newPost(fileUri: Uri, description: String) {
-
-        val postId = firestore.newPost(description)
-        storage.setFileToStorage(fileUri, FirebaseStorageApp.FileType.PostMedia, postId)
-            .collectLatest {
-                firestore.updatePostLink(it, postId)
-            }
-
+        CoroutineScope(Dispatchers.IO).launch {
+            val postId = firestore.newPost(description)
+            val url = storage.setFileToStorage(fileUri, FirebaseStorageApp.FileType.PostMedia, postId)
+            Log.d("checkCode", "here")
+            firestore.updatePostLink(url, postId)
+        }
     }
 
     override fun getUserId() = Firebase.auth.currentUser?.uid
 
-    override fun getUserFriendList(): Flow<Friends> = firestore.getFriendsList()
+    override fun getUserFriendList(id: String?): Flow<Friends> = firestore.getFriendsList(id)
 
     override fun getNotifications(): Flow<List<MyNotification>> = firestore.getNotifications()
 
@@ -85,12 +85,12 @@ class MyRepositoryImpl @Inject constructor(
     override fun getPostById(id: String): Flow<Post> = firestore.getPostById(id)
 
     override suspend fun loadAvatar(uri: Uri) {
-        val currentUser = getUserId() ?: ""
-        storage.setFileToStorage(uri, FirebaseStorageApp.FileType.UserAvatar, currentUser)
-            .collect() {
-                firestore.updateUserInformation(UserInformationUpdate.Avatar(it))
-            }
-
+        CoroutineScope(Dispatchers.IO).launch {
+            val currentUser = getUserId() ?: ""
+            val url =
+                storage.setFileToStorage(uri, FirebaseStorageApp.FileType.UserAvatar, currentUser)
+            firestore.updateUserInformation(UserInformationUpdate.Avatar(url))
+        }
     }
 
     override suspend fun like(postId: String) {
@@ -98,4 +98,9 @@ class MyRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getLikes(postId: String): List<String> = firestore.getLikes(postId)
+
+    override suspend fun deletePost(id: String) {
+        storage.deletePostMedia(id)
+        firestore.deletePost(id)
+    }
 }

@@ -6,10 +6,16 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class GetProfileInfoUseCase @Inject constructor(private val repository: MyRepository) {
-    operator fun invoke() = flow {
-        val id = repository.getUserId() ?: return@flow
-        val info = repository.getUserInformation(id) ?: UserInfo()
-        emit(info)
+    operator fun invoke(id: String? = null) = flow {
+        if (id.isNullOrEmpty()) {
+            val info = repository.getUserInformation(repository.getUserId() ?: return@flow) ?: UserInfo()
+            emit(info)
+        } else {
+            val info = repository.getUserInformation(id) ?: UserInfo()
+            emit(info)
+        }
+
+
     }
 
 

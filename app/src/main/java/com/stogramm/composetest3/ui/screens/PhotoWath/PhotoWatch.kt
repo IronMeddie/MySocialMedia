@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
@@ -83,7 +84,7 @@ fun PhotoWatch(viewModel : PhotoWatchViewModel = hiltViewModel()) {
                                 }
                             }
 
-                        }, alignment = Alignment.Center
+                        }, alignment = Alignment.Center, contentScale = ContentScale.FillWidth
                 )
             }
             is PhotoState.Loading ->{
