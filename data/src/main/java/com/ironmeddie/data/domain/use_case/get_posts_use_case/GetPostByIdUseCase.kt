@@ -13,7 +13,7 @@ class GetPostByIdUseCase @Inject constructor( private val repository: MyReposito
             author = repository.getUserInformation(post.author) ?: UserInfo(),
             likes = post.likes
                 .map { id -> repository.getUserInformation(id) ?: UserInfo() },
-            liked = repository.getUserId() in post.likes
+            liked = repository.getUserId() in post.likes,
         )
     }
 }

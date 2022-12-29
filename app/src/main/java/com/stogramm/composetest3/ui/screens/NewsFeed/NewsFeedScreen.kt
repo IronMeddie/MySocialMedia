@@ -1,5 +1,6 @@
 package com.stogramm.composetest3.ui.screens.NewsFeed
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,7 +40,8 @@ fun NewsFeedScreen(
             Scaffold(
                 topBar = {
                     Row(
-                        Modifier.fillMaxWidth(),
+                        Modifier.fillMaxWidth().shadow(12.dp)
+                            .background(MaterialTheme.colors.background),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {

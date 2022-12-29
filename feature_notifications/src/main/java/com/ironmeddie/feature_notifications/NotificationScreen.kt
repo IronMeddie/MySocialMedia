@@ -19,15 +19,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ironmeddie.data.domain.models.MyNotification
 import com.ironmeddie.data.domain.use_case.feature_notification_screen.NotificationItem
 
+sealed class NavigationDestination{
+    data class Profile(val userId : String): NavigationDestination()
+    data class Post(val postId : String): NavigationDestination()
+}
 
 @Composable
 fun NotificationScreen(
-    navController: NavController,
+    navigateTo: (dest : NavigationDestination) -> Unit,
     viewModel: NotificationsViewModel = hiltViewModel()
 ) {
     val list = viewModel.notifications.collectAsState().value
@@ -37,7 +40,13 @@ fun NotificationScreen(
                 NotificationFriendRequest(
                     notification,
                     onNavigate = {
-                        //todo navigation to user page
+                        when(notification.event){
+                            MyNotification.EVENT_FRIEND_REQUEST -> navigateTo(NavigationDestination.Profile(notification.authorID))
+                            MyNotification.EVENT_NEW_LIKE -> navigateTo(NavigationDestination.Post(notification.postId))
+                            MyNotification.EVENT_NEW_COMMENT -> navigateTo(NavigationDestination.Post(notification.postId))
+                        }
+                    }, onNavigateToPRofile = {
+                        navigateTo(NavigationDestination.Profile(notification.authorID))
                     }) {
                     if (!notification.isFriend) viewModel.friendShipConfirmed(notification.authorID)
                 }
@@ -52,13 +61,14 @@ fun NotificationScreen(
     }
 }
 
+
 @Composable
 fun NotificationFriendRequest(
     notification: NotificationItem,
     onNavigate: () -> Unit,
+    onNavigateToPRofile : ()-> Unit,
     onFriendshipConfirmed: () -> Unit
 ) {
-
     val userInfo = notification.userInfo
     Box(
         modifier = Modifier
@@ -75,18 +85,19 @@ fun NotificationFriendRequest(
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = if (userInfo.avatarUrl.isNullOrEmpty()) coil.base.R.drawable.notification_bg else userInfo.avatarUrl, contentDescription = "avatars", contentScale = ContentScale.Crop,
+                model = userInfo.avatarUrl, contentDescription = "avatars", contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(64.dp)
+                    .size(50.dp)
                     .clip(CircleShape)
                     .border(1.dp, MaterialTheme.colors.secondary, CircleShape)
+                    .clickable { onNavigateToPRofile() }
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.padding(end = 64.dp)) {
                 Text(
                     text = notification.information,
                     style = MaterialTheme.typography.body1,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Clip
                 )
                 Text(
@@ -108,7 +119,6 @@ fun NotificationFriendRequest(
             onClick = onFriendshipConfirmed,
             modifier = Modifier.align(Alignment.CenterEnd)
         ) {
-
             Icon(imageVector =if (!notification.isFriend) Icons.Default.Add else Icons.Default.Done, contentDescription = "add friend icon")
         }
     }

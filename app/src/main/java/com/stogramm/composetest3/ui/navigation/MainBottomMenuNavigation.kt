@@ -3,12 +3,15 @@ package com.stogramm.composetest3.ui.navigation
 
 import androidx.navigation.*
 import androidx.navigation.compose.composable
+import com.ironmeddie.feature_notifications.NavigationDestination
 import com.ironmeddie.feature_notifications.NotificationScreen
+import com.stogramm.composetest3.ui.screens.ItemDetails.navigateToItemDetails
 import com.stogramm.composetest3.ui.screens.NewsFeed.ListVM
 import com.stogramm.composetest3.ui.screens.NewsFeed.NewsFeedScreen
 import com.stogramm.composetest3.ui.screens.PhotoWath.PhotoWatch
 import com.stogramm.composetest3.ui.screens.PhotoWath.photoViewerRoute
 import com.stogramm.composetest3.ui.screens.userprofile.Profile
+import com.stogramm.composetest3.ui.screens.userprofile.navigateToProfile
 
 
 const val mainScreenNavigationRoute = "main_screen_route"
@@ -35,10 +38,19 @@ fun NavGraphBuilder.mainScreen(navController: NavController) {
         }
 
         composable(route = NotificationNavigationRoute) {
-            NotificationScreen(navController = navController)
+            NotificationScreen(navigateTo = {
+                when(it){
+                    is NavigationDestination.Profile -> navController.navigateToProfile(it.userId)
+                    is NavigationDestination.Post -> navController.navigateToItemDetails(it.postId)
+                }
+            })
+
+
         }
     }
 
 
 }
+
+
 

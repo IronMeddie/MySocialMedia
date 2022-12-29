@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavOptions
 import androidx.navigation.NavType
@@ -26,6 +27,7 @@ import com.stogramm.composetest3.ui.screens.PhotoWath.photoViewerRoute
 import com.stogramm.composetest3.ui.screens.login.loginScreen
 import com.stogramm.composetest3.ui.screens.login.navigateToLoginScreen
 import com.stogramm.composetest3.ui.screens.splash.Splash
+import com.stogramm.composetest3.ui.screens.userprofile.navigateToProfile
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -38,18 +40,21 @@ fun MainNavHost(checkAuthViewModel: CheckAuthViewModel = hiltViewModel()) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    val bottombar = currentDestination?.route?.contains(newsFeedNavigationRoute) == true || currentDestination?.route?.contains(userProfileNavigationRoute)== true || currentDestination?.route?.contains(NotificationNavigationRoute) == true
+    val bottombar =
+        currentDestination?.route?.contains(newsFeedNavigationRoute) == true || currentDestination?.route?.contains(
+            userProfileNavigationRoute
+        ) == true || currentDestination?.route?.contains(NotificationNavigationRoute) == true
 
-    val loginState : Boolean? = checkAuthViewModel.checkAuth().collectAsState(initial = null).value
 
-    val scope = rememberCoroutineScope()
+
+
     Scaffold(bottomBar = {
         if (bottombar) {
             BottomNavigation(navController)
         }
     }, modifier = Modifier.fillMaxSize()) { innerPadding ->
         LaunchedEffect(key1 = true) {
-            if (loginState == false) {
+            if (checkAuthViewModel.checkAuth() == false) {
                 navController.navigateToLoginScreen()
             }
         }
@@ -60,19 +65,10 @@ fun MainNavHost(checkAuthViewModel: CheckAuthViewModel = hiltViewModel()) {
         ) {
             loginScreen(navController = navController,
                 onRegistrationComplete = {
-                    scope.launch {
-                        do {
-                            if (loginState == true) {
-                                navController.navigateToMainScreen(
-                                    NavOptions.Builder().setLaunchSingleTop(true)
-                                        .setPopUpTo(navController.graph.id, true).build()
-                                )
-                            }
-                            delay(100)
-                        } while (loginState != true)
-
-                    }
-
+                    navController.navigateToMainScreen(
+                        NavOptions.Builder().setLaunchSingleTop(true)
+                            .setPopUpTo(navController.graph.id, true).build()
+                    )
                 })
             composable(ItemViewerScreenRoute + "/{${Const.ITEM_ID}}") {
                 LentaItemWatch(navController)
@@ -89,7 +85,9 @@ fun MainNavHost(checkAuthViewModel: CheckAuthViewModel = hiltViewModel()) {
             mainScreen(navController)
             newPostScreen(navController)
             Splash()
-            searchFriendsScreen()
+            searchFriendsScreen(){
+                navController.navigateToProfile(it)
+            }
 
         }
 

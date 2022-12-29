@@ -2,6 +2,7 @@ package com.ironmeddie.feature_add_friend.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,7 +15,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,7 +28,7 @@ import com.ironmeddie.data.domain.models.UserInfo
 
 
 @Composable
-fun SearchFriendsScreen(viewModel : SearchFriendsViewModel = hiltViewModel()) {
+fun SearchFriendsScreen(viewModel : SearchFriendsViewModel = hiltViewModel(), navigateToProfile: (id: String) -> Unit) {
 
     val state = viewModel.resultList
     val request = viewModel.request.collectAsState().value
@@ -41,7 +44,7 @@ fun SearchFriendsScreen(viewModel : SearchFriendsViewModel = hiltViewModel()) {
                 Box(
                     Modifier
                         .fillMaxSize().padding(40.dp)) {
-                    Text(text = "search", modifier = Modifier.align(Alignment.TopCenter))
+                    Text(text = "no data", modifier = Modifier.align(Alignment.TopCenter))
                 }
             }
             is SearchScreenState.Loading -> {
@@ -56,9 +59,9 @@ fun SearchFriendsScreen(viewModel : SearchFriendsViewModel = hiltViewModel()) {
                     .fillMaxSize()
                     .padding(it)){
                     items(state.list){ userinfo->
-                        SearchFriendListItem(userinfo){
+                        SearchFriendListItem(userinfo, navigateToProfile = {navigateToProfile(userinfo.id)}, addFriend = {
                             viewModel.addFriend(userinfo.id)
-                        }
+                        })
                     }
                 }
             }
@@ -80,21 +83,31 @@ private fun SearchBar(value: String, onValueChanged : (String) -> Unit){
 
 
     Box(modifier = Modifier
+
+        .shadow(40.dp, CircleShape)
+        .padding(4.dp)
+        .clip(CircleShape)
+        .background(MaterialTheme.colors.background)
         .fillMaxWidth()
         .height(50.dp)
-        .background(Color.Blue)) {
+
+
+
+    , contentAlignment = Alignment.Center
+        ) {
         TransparentHintTextField(text = value,
             hint = "search" ,
             onValueChange = {str-> onValueChanged(str) },
             onFocusChange = {  },
             isHintVisible = value.isBlank()
         , modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .height(40.dp)
                 .padding(horizontal = 16.dp)
                 .background(Color.White)
                 .padding(vertical = 8.dp),
             singleLine = true,
-            textStyle = MaterialTheme.typography.h6,
+            textStyle = MaterialTheme.typography.body1,
             hintAlign = Alignment.CenterStart,
             bodyAlign = Alignment.Center,
         )
@@ -102,12 +115,13 @@ private fun SearchBar(value: String, onValueChanged : (String) -> Unit){
 }
 
 @Composable
-private fun SearchFriendListItem(userInfo: UserInfo, addFriend:()->Unit){
+private fun SearchFriendListItem(userInfo: UserInfo, addFriend:()->Unit, navigateToProfile : () ->Unit){
     Box(modifier = Modifier
         .fillMaxWidth()
-        .padding(horizontal = 8.dp)) {
+        .padding(horizontal = 8.dp)
+        .clickable { navigateToProfile() }) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
-            AsyncImage(model = userInfo.avatarUrl, contentDescription = "avatars",
+            AsyncImage(model = userInfo.avatarUrl, contentDescription = "avatars", contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
@@ -115,7 +129,7 @@ private fun SearchFriendListItem(userInfo: UserInfo, addFriend:()->Unit){
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.padding(end = 64.dp)) {
-                Text(text = userInfo.username.toString(), style = MaterialTheme.typography.h6, maxLines = 1, overflow = TextOverflow.Clip)
+                Text(text = userInfo.username.toString(), style = MaterialTheme.typography.body1, maxLines = 1, overflow = TextOverflow.Clip)
                 Text(text = userInfo.secondname + " " + userInfo.firstname, style = MaterialTheme.typography.body2, maxLines = 1, overflow = TextOverflow.Clip )
             }
         }
@@ -127,7 +141,7 @@ private fun SearchFriendListItem(userInfo: UserInfo, addFriend:()->Unit){
 @Preview(showBackground = true)
 @Composable
 private fun prewiw(){
-    SearchFriendListItem(UserInfo(username = "Ogdfsdfsdasdasdassadsadsfdsdfsd", firstname = "Oleg", secondname = "Chickov")){
+    SearchFriendListItem(UserInfo(username = "Ogdfsdfsdasdasdassadsadsfdsdfsd", firstname = "Oleg", secondname = "Chickov"),{}){
 
     }
 }

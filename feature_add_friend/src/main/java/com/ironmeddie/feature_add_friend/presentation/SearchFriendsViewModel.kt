@@ -34,16 +34,20 @@ class SearchFriendsViewModel @Inject constructor(
 
         if (!str.contains("\n")) _request.value = str
         job?.cancel()
-        if (_request.value.isNotEmpty()) {
-            resultList = SearchScreenState.Loading
-            job = searchFriendsUseCase(str).catch {
-                    exception -> resultList = SearchScreenState.Error(exception.message.toString())
-            }.onEach {
-                resultList = SearchScreenState.Success(it)
-            }.launchIn(viewModelScope)
-        }else{
-            resultList = SearchScreenState.NoWork
+        job = viewModelScope.launch {
+            delay(300)
+            if (_request.value.isNotEmpty()) {
+                resultList = SearchScreenState.Loading
+                searchFriendsUseCase(str).catch {
+                        exception -> resultList = SearchScreenState.Error(exception.message.toString())
+                }.collect {
+                    resultList = SearchScreenState.Success(it)
+                }
+            }else{
+                resultList = SearchScreenState.NoWork
+            }
         }
+
     }
 
     fun addFriend(id: String) {

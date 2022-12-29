@@ -13,8 +13,10 @@ fun NavController.navigateToSearchScreen(navOptions: NavOptions? = null){
     this.navigate(searchScreenRoute)
 }
 
-fun NavGraphBuilder.searchFriendsScreen(){
+fun NavGraphBuilder.searchFriendsScreen(navigateToProfile :(id: String) -> Unit){
     composable(searchScreenRoute){
-        SearchFriendsScreen()
+        SearchFriendsScreen(){
+            navigateToProfile(it)
+        }
     }
 }

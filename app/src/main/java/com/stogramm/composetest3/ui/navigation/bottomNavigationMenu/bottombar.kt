@@ -1,6 +1,7 @@
 package com.stogramm.composetest3.ui.navigation.bottomNavigationMenu
 
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -54,8 +55,8 @@ fun BottomNavigation(navController: NavController) {
     val boxSize = 100.dp
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp),
+            .fillMaxWidth().height(50.dp).shadow(12.dp)
+            .background(MaterialTheme.colors.background),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {

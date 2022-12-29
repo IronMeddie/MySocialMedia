@@ -190,9 +190,10 @@ class MyFireStore {
 
     fun getPostById(id: String) =
         flow {
+            val currentUser = Firebase.auth.currentUser?.uid
             val document = db.collection(POSTS_NODE).document(id).get().await()
             val post = document.toObject(PostDto::class.java)?.toPost()?.copy(id = document.id) ?: Post()
-            emit(post)
+            emit(post.copy(isAuthor = currentUser == post.author))
         }
 
     @Throws(NoAuthExeption::class)
