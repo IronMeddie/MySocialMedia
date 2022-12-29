@@ -1,11 +1,8 @@
 package com.stogramm.composetest3.ui.screens.NewsFeed
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ironmeddie.data.data.remote.FirebaseAuthApp
 import com.ironmeddie.data.domain.models.PostWithAuthor
 import com.ironmeddie.data.domain.use_case.delete_post.DeletePostUseCase
 import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostsUseCase
@@ -21,29 +18,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ListVM @Inject constructor(
-    private val cauth: FirebaseAuthApp,
     private val getPosts: GetPostsUseCase,
     private val likeUseCase: LikeUseCase,
     private val deletePostUseCase: DeletePostUseCase
 
-    ) : ViewModel() {
+) : ViewModel() {
     private var _tasks = MutableStateFlow<DataState<List<PostWithAuthor>>>(DataState.Loading)
     val tasks get() = _tasks
-
-    var loginState: Boolean? by mutableStateOf(null)
-        private set
 
     private var job: Job? = null
 
     init {
-        checkAuth()
         getNews()
-    }
-
-    fun checkAuth() {
-        viewModelScope.launch {
-            loginState = cauth.checkAuth()
-        }
     }
 
     fun liked(item: PostWithAuthor) {
@@ -54,17 +40,18 @@ class ListVM @Inject constructor(
     }
 
     fun getNews() {
-        if (loginState == true) {
+        try {
             job?.cancel()
             job = getPosts().onEach {
                 _tasks.value = DataState.Success(it)
             }.launchIn(viewModelScope)
-        } else {
-            _tasks.value = DataState.Error("login state is not true")
+        }catch (e : Exception){
+            e.localizedMessage?.let { Log.d("checkCode", it) }
         }
+
     }
 
-    fun deletePost(id:String){
+    fun deletePost(id: String) {
         viewModelScope.launch {
             deletePostUseCase(id)
         }

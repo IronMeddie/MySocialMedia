@@ -19,6 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.ironmeddie.data.data.remote.utils.PostNodes.fileUrl
 import com.stogramm.composetest3.ui.theme.Black
 import kotlinx.coroutines.launch
 
@@ -48,7 +49,7 @@ fun PhotoWatch(viewModel : PhotoWatchViewModel = hiltViewModel()) {
         when(state){
             is PhotoState.Success -> {
                 AsyncImage(
-                    model = state.post.fileUrl, contentDescription = "Photo watch", modifier = Modifier
+                    model = state.post.post.fileUrl, contentDescription = "Photo watch", modifier = Modifier
                         .combinedClickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,

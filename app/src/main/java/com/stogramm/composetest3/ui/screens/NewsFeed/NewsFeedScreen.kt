@@ -12,8 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.ironmeddie.data.domain.models.Post
 import com.ironmeddie.data.domain.utils.DataState
 import com.ironmeddie.feature_add_friend.navigation.navigateToSearchScreen
 import com.ironmeddie.feature_feed.feed_item.FeedItem
@@ -25,15 +25,13 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun NewsFeedScreen(
-    ListVM: ListVM,
+    viewModel: ListVM = hiltViewModel(),
     navController: NavController,
-    view: (wellnessTask: Post) -> Unit
 ) {
-
-    val state = ListVM.tasks.collectAsState().value
+    val state = viewModel.tasks.collectAsState().value
     LaunchedEffect(key1 = true) {
-        delay(1000)
-        ListVM.getNews()
+        delay(200)
+        viewModel.getNews()
     }
     when (state) {
         is DataState.Success -> {
@@ -77,11 +75,11 @@ fun NewsFeedScreen(
                             onClikToBody = { navController.navigateToItemDetails(post.post.id) },
                             onLike = {
                                 news = news.copy(liked = !news.liked)
-                                ListVM.liked(post)
+                                viewModel.liked(post)
                             },
                             onClikComment = {},
                             onClikShare = {},
-                            onClikDelete = { ListVM.deletePost(post.post.id) },
+                            onClikDelete = { viewModel.deletePost(post.post.id) },
                             onClickToPhoto = {})
                     }
                 }

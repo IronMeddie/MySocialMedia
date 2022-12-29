@@ -11,9 +11,9 @@ import com.ironmeddie.data.domain.use_case.delete_post.DeletePostUseCase
 import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostsUseCase
 import com.ironmeddie.data.domain.utils.DataState
 import com.ironmeddie.domain.usecases.LogOutUseCase
-import com.stogramm.composetest3.ui.screens.PhotoWath.get_profile_use_case.GetProfileInfoUseCase
-import com.stogramm.composetest3.ui.screens.PhotoWath.get_profile_use_case.GetUserFriendsUseCase
-import com.stogramm.composetest3.ui.screens.PhotoWath.get_profile_use_case.UpdateAvatarUseCase
+import com.ironmeddie.data.domain.use_case.get_profile_use_case.GetProfileInfoUseCase
+import com.ironmeddie.data.domain.use_case.get_profile_use_case.GetUserFriendsUseCase
+import com.ironmeddie.data.domain.use_case.get_profile_use_case.UpdateAvatarUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -6,11 +6,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.ironmeddie.data.domain.models.PostWithAuthor
-import com.ironmeddie.data.domain.utils.DataState
 import com.ironmeddie.feature_feed.feed_item.FeedItem
-import com.stogramm.composetest3.ui.screens.NewsFeed.ListVM
 import com.stogramm.composetest3.ui.screens.PhotoWath.photoViewerRoute
 import com.stogramm.composetest3.ui.screens.userprofile.navigateToProfile
 
@@ -19,14 +17,13 @@ const val ItemViewerScreenRoute = "Item_viewer_route"
 
 @Composable
 fun LentaItemWatch(
-    newsID: String?,
-    vs: ListVM,
     navController: NavController,
+    viewModel : PostDetailsViewModel = hiltViewModel()
 ) {
 
-    val state = vs.tasks.collectAsState().value
-    val post = if (state is DataState.Success) state.data.firstOrNull { it.post.id == newsID }
-        ?: PostWithAuthor() else PostWithAuthor()
+    val state = viewModel.state.collectAsState().value
+    //todo check for response
+    val post = state
 
     Scaffold(modifier = Modifier.fillMaxSize()) { pad ->
         LazyColumn(
@@ -38,11 +35,12 @@ fun LentaItemWatch(
                     news,
                     onClikToAuthor = { navController.navigateToProfile(post.author.id) },
                     onClikToBody = { },
-                    onLike = { news = news.copy(liked = !news.liked) },
+                    onLike = { news = news.copy(liked = !news.liked)
+                             viewModel.like(post)},
                     onClikComment = {},
                     onClikShare = {},
                     onClikDelete = {
-                        vs.deletePost(post.post.id)
+                        viewModel.deletePost(post.post.id)
                     },
                     onClickToPhoto = { navController.navigate(photoViewerRoute + "?id=${post.post.id}") },
                     isDetailsScreen = true

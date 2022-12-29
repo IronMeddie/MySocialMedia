@@ -4,8 +4,7 @@ import android.net.Uri
 import androidx.compose.ui.focus.FocusState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ironmeddie.feature_new_post.domain.use_case.PostNewPhotoUseCase
-import com.ironmeddie.common.TextFieldState
+import com.ironmeddie.data.domain.use_case.post_photo_use_case.PostNewPhotoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -1,4 +1,4 @@
-package com.ironmeddie.feature_new_post.domain.use_case
+package com.ironmeddie.data.domain.use_case.post_photo_use_case
 
 import android.net.Uri
 import com.ironmeddie.data.data.repository.MyRepositoryImpl

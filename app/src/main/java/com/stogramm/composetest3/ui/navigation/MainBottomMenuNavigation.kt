@@ -21,15 +21,11 @@ fun NavController.navigateToMainScreen(navOptions: NavOptions? = null) {
     this.navigate(mainScreenNavigationRoute, navOptions)
 }
 
-fun NavGraphBuilder.mainScreen(
-    viewModel: ListVM, navController: NavController, onNavigateToDetails: (postId: String) -> Unit
-) {
+fun NavGraphBuilder.mainScreen(navController: NavController) {
 
     navigation(route = mainScreenNavigationRoute, startDestination = newsFeedNavigationRoute) {
         composable(route = newsFeedNavigationRoute) {
-            NewsFeedScreen(viewModel,navController) {
-                onNavigateToDetails(it.id)
-            }
+            NewsFeedScreen(navController = navController)
         }
         composable(route = userProfileNavigationRoute + "?id={id}", arguments =  listOf(
             navArgument(name = "id"){

@@ -31,9 +31,7 @@ class MyRepositoryImpl @Inject constructor(
 
     override suspend fun deleteUserFromLocal(user: UserInfo) = articleDao.delete(user)
 
-    override suspend fun signIn(email: String, password: String) {
-        firebaseAuthApp.signIn(email = email, password = password)
-    }
+    override suspend fun signIn(email: String, password: String) = firebaseAuthApp.signIn(email = email, password = password)
 
     override fun logOut() {
         firebaseAuthApp.signOut()

@@ -15,7 +15,7 @@ interface MyRepository {
 
     suspend fun deleteUserFromLocal(user: UserInfo)
 
-    suspend fun signIn(email: String, password: String)
+    suspend fun signIn(email: String, password: String): String?
 
     fun logOut()
 

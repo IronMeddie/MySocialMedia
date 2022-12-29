@@ -8,6 +8,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ironmeddie.data.domain.models.Post
+import com.ironmeddie.data.domain.models.PostWithAuthor
 import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostByIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -48,6 +49,6 @@ private val getPost: GetPostByIdUseCase
 
 sealed class PhotoState{
     object Loading: PhotoState()
-    data class Success(val post : Post): PhotoState()
+    data class Success(val post : PostWithAuthor): PhotoState()
     data class Error(val message : String): PhotoState()
 }

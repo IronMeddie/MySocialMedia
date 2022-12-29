@@ -46,7 +46,7 @@ fun BottomNavigation(navController: NavController) {
         }
     }
     val home = currentDestination?.hierarchy?.any { s -> s.route == newsFeedNavigationRoute }
-    val profile = currentDestination?.hierarchy?.any { s -> s.route == userProfileNavigationRoute }
+    val profile = currentDestination?.hierarchy?.any { s -> s.route?.contains(userProfileNavigationRoute) == true }
     val notification =
         currentDestination?.hierarchy?.any { s -> s.route == NotificationNavigationRoute }
 
