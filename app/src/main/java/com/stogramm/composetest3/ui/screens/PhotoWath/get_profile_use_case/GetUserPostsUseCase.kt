@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class GetUserPostsUseCase @Inject constructor(private val repository: MyRepositoryImpl) {
-     operator fun invoke(): Flow<List<Post>> {
-        val list = mutableListOf(repository.getUserId().toString())
-        return repository.getPosts(list).map { it.sortedByDescending{ it.timeStamp } }
-    }
-}
+//class GetUserPostsUseCase @Inject constructor(private val repository: MyRepositoryImpl) {
+//     operator fun invoke(): Flow<List<Post>> {
+//        val list = mutableListOf(repository.getUserId().toString())
+//        return repository.getPosts(list).map { it.sortedByDescending{ it.time } }
+//    }
+//}

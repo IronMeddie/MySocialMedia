@@ -93,8 +93,8 @@ class MyRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun like(postId: String) {
-        firestore.like(postId)
+    override suspend fun like(postId: String, postAuthor:String) {
+        firestore.like(postId, postAuthor)
     }
 
     override suspend fun getLikes(postId: String): List<String> = firestore.getLikes(postId)
@@ -103,4 +103,6 @@ class MyRepositoryImpl @Inject constructor(
         storage.deletePostMedia(id)
         firestore.deletePost(id)
     }
+
+    override suspend fun removeLike(id: String) = firestore.removeLike(id)
 }

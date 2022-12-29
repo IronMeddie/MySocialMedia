@@ -11,8 +11,6 @@ import javax.inject.Inject
 class GetPostsUseCase @Inject constructor(private val repository: MyRepository) {
 
 
-
-
     operator fun invoke(option: PostOption = PostOption.Feed) = if (option is PostOption.Feed) {
         repository.getUserFriendList().flatMapLatest {
             val list = mutableListOf(repository.getUserId().toString())
@@ -22,9 +20,9 @@ class GetPostsUseCase @Inject constructor(private val repository: MyRepository) 
                     PostWithAuthor(
                         post = post,
                         author = repository.getUserInformation(post.author) ?: UserInfo(),
-                        likes = repository.getLikes(post.id)
+                        likes = post.likes
                             .map { id -> repository.getUserInformation(id) ?: UserInfo() },
-                        liked = repository.getUserId() in repository.getLikes(post.id)
+                        liked = repository.getUserId() in post.likes
                     )
                 }
             }
@@ -36,9 +34,9 @@ class GetPostsUseCase @Inject constructor(private val repository: MyRepository) 
                 PostWithAuthor(
                     post = post,
                     author = repository.getUserInformation(post.author) ?: UserInfo(),
-                    likes = repository.getLikes(post.id)
+                    likes = post.likes
                         .map { id -> repository.getUserInformation(id) ?: UserInfo() },
-                    liked = repository.getUserId() in repository.getLikes(post.id)
+                    liked = repository.getUserId() in post.likes
                 )
             }
         }

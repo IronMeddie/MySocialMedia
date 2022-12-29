@@ -6,17 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ironmeddie.data.data.remote.FirebaseAuthApp
-import com.ironmeddie.data.domain.models.Post
 import com.ironmeddie.data.domain.models.PostWithAuthor
 import com.ironmeddie.data.domain.use_case.delete_post.DeletePostUseCase
 import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostsUseCase
-import com.ironmeddie.data.domain.use_case.like_use_case.GetLikesUseCase
 import com.ironmeddie.data.domain.use_case.like_use_case.LikeUseCase
 import com.ironmeddie.data.domain.utils.DataState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -27,7 +24,6 @@ class ListVM @Inject constructor(
     private val cauth: FirebaseAuthApp,
     private val getPosts: GetPostsUseCase,
     private val likeUseCase: LikeUseCase,
-    private val getLikesUseCase: GetLikesUseCase,
     private val deletePostUseCase: DeletePostUseCase
 
     ) : ViewModel() {
@@ -50,9 +46,9 @@ class ListVM @Inject constructor(
         }
     }
 
-    fun liked(item: Post) {
+    fun liked(item: PostWithAuthor) {
         viewModelScope.launch {
-            likeUseCase(item.id)
+            likeUseCase(item)
         }
         getNews()
     }
@@ -76,11 +72,6 @@ class ListVM @Inject constructor(
     }
 
 
-    fun getLikes(postId: String){
-//        getLikesUseCase(postId).onEach {
-//            Log.d("checkCode", it.toString())
-//        }.launchIn(viewModelScope)
-    }
 }
 
 

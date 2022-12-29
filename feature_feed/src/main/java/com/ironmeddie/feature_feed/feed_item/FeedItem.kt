@@ -1,8 +1,6 @@
 package com.ironmeddie.feature_feed.feed_item
 
 
-import androidx.compose.animation.Animatable
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.ironmeddie.data.domain.models.Post
 import com.ironmeddie.data.domain.models.PostWithAuthor
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -36,6 +33,8 @@ fun FeedItem(
     onClikComment: () -> Unit,
     onClikShare: () -> Unit,
     onClikDelete: () -> Unit,
+    onClickToPhoto: () -> Unit,
+    isDetailsScreen: Boolean = false
 ) {
     Column(modifier = Modifier.clickable { onClikToBody() }) {
         Row(
@@ -63,17 +62,23 @@ fun FeedItem(
                     text = post.author.username ?: "unknown",
                     style = MaterialTheme.typography.body1
                 )
+
             }
             // todo проверить на авторство пост дабы функция удаления была только у автора
-            var expanded by remember { mutableStateOf(false) }
-            IconButton(onClick = { expanded = !expanded }, modifier = Modifier.padding(end = 11.dp)) {
-                Icon(imageVector = Icons.Default.MoreVert, contentDescription = "post options")
-                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    DropdownMenuItem(onClick = {
-                        onClikDelete()
-                        expanded = !expanded
-                    }) {
-                        Text(text = "Delete post")
+            if (post.post.isAuthor){
+                var expanded by remember { mutableStateOf(false) }
+                IconButton(
+                    onClick = { expanded = !expanded },
+                    modifier = Modifier.padding(end = 11.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.MoreVert, contentDescription = "post options")
+                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        DropdownMenuItem(onClick = {
+                            onClikDelete()
+                            expanded = !expanded
+                        }) {
+                            Text(text = "Delete post")
+                        }
                     }
                 }
             }
@@ -82,16 +87,29 @@ fun FeedItem(
         AsyncImage(
             model = post.post.fileUrl,
             contentDescription = "main content photo",
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    if (isDetailsScreen)
+                        onClickToPhoto()
+                    else onClikToBody()
+                },
             contentScale = ContentScale.FillWidth
         ) // content
-        Text(text = post.post.descr, style = MaterialTheme.typography.body1, modifier = Modifier.padding(start = 8.dp, top = 4.dp), maxLines = 3)
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 8.dp, end = 8.dp, top = 4.dp)) {
+        Text(
+            text = post.post.descr,
+            style = MaterialTheme.typography.body1,
+            modifier = Modifier.padding(start = 8.dp, top = 4.dp),
+            maxLines = if (!isDetailsScreen) 3 else Int.MAX_VALUE
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 8.dp, top = 4.dp)
+        ) {
             if (post.likes.isNotEmpty()) Text(
                 modifier = Modifier.align(Alignment.BottomStart),
-                text = "likes " + post.likes.size.toString(),
+                text = "likes " + post.post.likes.size.toString(),
                 style = MaterialTheme.typography.body2
             )
             Text(
@@ -106,24 +124,27 @@ fun FeedItem(
 
         Row(modifier = Modifier.fillMaxWidth()) {  // buttons: likes, comments
 
-            val scope = rememberCoroutineScope()
             val image = if (!post.liked) Icons.Default.FavoriteBorder else Icons.Default.Favorite
             val targetcolor = Color(0xFFAA2D2D)
             val initialColor = Color.Black
-            val color = remember { Animatable(initialColor) }
-            IconButton(onClick = {onLike()
-                scope.launch {
-                    color.animateTo(if (!post.liked) targetcolor else initialColor, animationSpec = tween(600))
-
-                }
-                } ){
-                Icon(imageVector = image, contentDescription = "post like", tint = color.value)
+            IconButton(onClick = {
+                onLike()
+            }) {
+                Icon(imageVector = image, contentDescription = "post like", tint = if (!post.liked) initialColor else targetcolor)
             }
-            IconButton(onClick = onClikComment) {
-                Icon(imageVector = Icons.Default.Comment, contentDescription = "post comment", tint = initialColor)
+            if (!isDetailsScreen) IconButton(onClick = onClikComment) {
+                Icon(
+                    imageVector = Icons.Default.Comment,
+                    contentDescription = "post comment",
+                    tint = initialColor
+                )
             }
             IconButton(onClick = onClikShare) {
-                Icon(imageVector = Icons.Default.Share, contentDescription = "post share", tint = initialColor)
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = "post share",
+                    tint = initialColor
+                )
             }
         }
 

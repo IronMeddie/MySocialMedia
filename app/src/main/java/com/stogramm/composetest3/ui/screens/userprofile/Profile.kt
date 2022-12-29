@@ -3,8 +3,7 @@ package com.stogramm.composetest3.ui.screens.userprofile
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -32,14 +31,16 @@ fun Profile(navController: NavController, viewModel: ProfileViewModel = hiltView
             item { ProfileDescription(state.data) }
 
             items(state.data.posts){ post->
+                var news by remember { mutableStateOf(post) }
                 FeedItem(
-                    post = post,
+                    post = news,
                     onClikToAuthor = { /*TODO*/ },
                     onClikToBody = { navController.navigateToItemDetails(post.post.id) },
-                    onLike = { /*TODO*/ },
+                    onLike = { news = news.copy(liked = !news.liked) /*TODO*/ },
                     onClikComment = { /*TODO*/ },
                     onClikDelete = {viewModel.deletePosto(post.post.id)},
-                    onClikShare = {/*TODO*/}
+                    onClikShare = {/*TODO*/},
+                    onClickToPhoto = {/*TODO*/}
                 )
             }
         }

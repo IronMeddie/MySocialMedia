@@ -6,10 +6,12 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.ironmeddie.data.data.dto.PostDto
 import com.ironmeddie.data.data.remote.utils.PostNodes
 import com.ironmeddie.data.data.remote.utils.UserNodes
 import com.ironmeddie.data.domain.models.MyNotification
 import com.ironmeddie.data.domain.models.MyNotification.Companion.EVENT_FRIEND_REQUEST
+import com.ironmeddie.data.domain.models.MyNotification.Companion.EVENT_NEW_LIKE
 import com.ironmeddie.data.domain.models.Post
 import com.ironmeddie.data.domain.models.UserInfo
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +23,7 @@ const val USERS_NODE = "users"
 const val POSTS_NODE = "posts"
 const val FRIENDS_NODE = "friendsList"
 const val NOTIFI_NODE = "notifications"
-const val LIKES_NODE = "likes"
+const val LIKES_CHILD = "likes"
 
 
 class MyFireStore {
@@ -55,29 +57,20 @@ class MyFireStore {
                 PostNodes.descr to description,
                 PostNodes.timeStamp to FieldValue.serverTimestamp(),
                 PostNodes.author to currentUser
-
             )
         ).await().id
     }
 
 
-
     fun getPosts(authorsId: List<String>) = flow {
-        val querry = db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await().map {
-            Post(
-            id = it.id,
-            author = it.data["author"].toString(),
-            timeStamp = (it.data["timeStamp"] as Timestamp).toDate(),
-            descr = it.data["descr"].toString(),
-            fileUrl = it.data["fileUrl"].toString(),
-            time = Instant.ofEpochSecond((it.data["timeStamp"] as Timestamp).seconds, (it.data["timeStamp"] as Timestamp).nanoseconds.toLong() ).atZone(ZoneId.systemDefault()).toLocalDateTime()
-
-        )
+        val currentUser = Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("newPost failure")
+        val querry = db.collection(POSTS_NODE).whereIn(PostNodes.author, authorsId).get().await()
+        val list = querry.map {
+            val post = it.toObject(PostDto::class.java).copy(id = it.id).toPost()
+            post.copy(isAuthor = post.author == currentUser)
         }
-
-        emit(querry)
+        emit(list)
     }
-
 
 
     suspend fun updatePostLink(url: String, postId: String) {
@@ -90,13 +83,16 @@ class MyFireStore {
             Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("updateUserInformation failure")
         when (information) {
             is UserInformationUpdate.ChangeUsername -> {
-                db.collection(USERS_NODE).document(currentUser).update(UserNodes.username, information.username).await()
+                db.collection(USERS_NODE).document(currentUser)
+                    .update(UserNodes.username, information.username).await()
             }
-            is UserInformationUpdate.Avatar ->{
-             db.collection(USERS_NODE).document(currentUser).update(UserNodes.avatarUrl, information.fileUrl).await()
+            is UserInformationUpdate.Avatar -> {
+                db.collection(USERS_NODE).document(currentUser)
+                    .update(UserNodes.avatarUrl, information.fileUrl).await()
             }
-            is UserInformationUpdate.About ->{
-                db.collection(USERS_NODE).document(currentUser).update(UserNodes.about, information.desc).await()
+            is UserInformationUpdate.About -> {
+                db.collection(USERS_NODE).document(currentUser)
+                    .update(UserNodes.about, information.desc).await()
             }
         }
     }
@@ -171,17 +167,19 @@ class MyFireStore {
         val currentUser =
             Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("getNotifications failure")
         return flow {
-            emit(
+            val list =
                 db.collection(NOTIFI_NODE).whereEqualTo("recieverId", currentUser).get().await()
-                    .toObjects(MyNotification::class.java)
-            )
+                    .toObjects(MyNotification::class.java).toMutableList()
+            list.removeIf { it.authorID == currentUser }
+            emit(list)
         }
     }
 
 
     @Throws(NoAuthExeption::class)
     fun getFriendsList(id: String? = null): Flow<Friends> {
-        val currentUser = if (id?.isNotBlank() == true) id else Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("getNotifications failure")
+        val currentUser = if (id?.isNotBlank() == true) id else Firebase.auth.currentUser?.uid
+            ?: throw NoAuthExeption("getNotifications failure")
         return flow {
             val list = db.collection(FRIENDS_NODE).document(currentUser).get().await()
                 .toObject(Friends::class.java)
@@ -193,36 +191,37 @@ class MyFireStore {
     fun getPostById(id: String) =
         flow {
             val document = db.collection(POSTS_NODE).document(id).get().await()
-            document.data.let { map ->
-                val id = document.id
-                val author = map?.get("author").toString()
-                val timeStamp = (map?.get("timeStamp") as Timestamp).toDate()
-                val descr = map["descr"].toString()
-                val fileUrl = map["fileUrl"].toString()
-                val post = Post(
-                    id = id,
-                    author = author,
-                    timeStamp = timeStamp,
-                    descr = descr,
-                    fileUrl = fileUrl
-                )
-                emit(post)
-            }
-
+            val post = document.toObject(PostDto::class.java)?.toPost()?.copy(id = document.id) ?: Post()
+            emit(post)
         }
 
     @Throws(NoAuthExeption::class)
-    suspend fun like(postId: String){
+    suspend fun like(postId: String, postAuthor: String) {
         val currentUser = Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("like failure")
-        val data = hashMapOf<String,Any>("id" to FieldValue.arrayUnion(currentUser))
-        db.collection(LIKES_NODE).document(postId).set(data).await()
+        db.collection(POSTS_NODE).document(postId)
+            .update(LIKES_CHILD, FieldValue.arrayUnion(currentUser)).await()
+        db.collection(NOTIFI_NODE).add(
+            hashMapOf(
+                "recieverId" to postAuthor,
+                "event" to EVENT_NEW_LIKE,
+                "authorID" to currentUser,
+                "timeStamp" to FieldValue.serverTimestamp(),
+                "postId" to postId
+            )
+        )
     }
 
-    suspend fun getLikes(postId: String) = db.collection(LIKES_NODE).document(postId).get().await().toObject<Likes>()?.id ?: emptyList()
+    suspend fun getLikes(postId: String) = emptyList<String>() /*TODO*/
 
 
-    suspend fun deletePost(id: String){
+    suspend fun deletePost(id: String) {
         db.collection(POSTS_NODE).document(id).delete().await()
+    }
+
+    suspend fun removeLike(id: String) {
+        val currentUser = Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("like failure")
+        db.collection(POSTS_NODE).document(id)
+            .update(LIKES_CHILD, FieldValue.arrayRemove(currentUser)).await()
     }
 
 
@@ -238,7 +237,8 @@ sealed class UserInformationUpdate(information: String) {
     data class Avatar(val fileUrl: String) : UserInformationUpdate(fileUrl)
     data class About(val desc: String) : UserInformationUpdate(desc)
 }
-data class Likes(val id : List<String> = emptyList())
+
+data class Likes(val id: List<String> = emptyList())
 
 class NoAuthExeption(message: String) : Exception(message)
 

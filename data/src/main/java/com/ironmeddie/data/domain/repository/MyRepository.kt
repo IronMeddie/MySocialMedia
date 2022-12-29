@@ -43,10 +43,12 @@ interface MyRepository {
 
     suspend fun loadAvatar(uri: Uri)
 
-    suspend fun like(postId: String)
+    suspend fun like(postId: String , postAuthor:String)
 
     suspend fun getLikes(postId: String): List<String>
 
     suspend fun deletePost(id: String)
+
+    suspend fun removeLike(id: String)
 
 }

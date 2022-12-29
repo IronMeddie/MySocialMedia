@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.ironmeddie.data.domain.models.MyNotification
 import com.ironmeddie.data.domain.use_case.feature_notification_screen.NotificationItem
 
 
@@ -102,6 +103,7 @@ fun NotificationFriendRequest(
                 )
             }
         }
+        if (notification.event == MyNotification.EVENT_FRIEND_REQUEST)
         IconButton(
             onClick = onFriendshipConfirmed,
             modifier = Modifier.align(Alignment.CenterEnd)

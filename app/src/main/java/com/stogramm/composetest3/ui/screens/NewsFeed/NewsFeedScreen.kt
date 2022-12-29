@@ -1,11 +1,8 @@
 package com.stogramm.composetest3.ui.screens.NewsFeed
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -13,26 +10,16 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import com.ironmeddie.data.domain.models.Post
-import com.ironmeddie.data.domain.models.PostWithAuthor
 import com.ironmeddie.data.domain.utils.DataState
 import com.ironmeddie.feature_add_friend.navigation.navigateToSearchScreen
 import com.ironmeddie.feature_feed.feed_item.FeedItem
 import com.ironmeddie.feature_new_post.presentation.navigation.navigateToNewPostScreen
-import com.stogramm.composetest3.R
 import com.stogramm.composetest3.ui.screens.ItemDetails.navigateToItemDetails
 import com.stogramm.composetest3.ui.screens.userprofile.navigateToProfile
-import com.stogramm.composetest3.ui.utilComposes.LikeButton
 import kotlinx.coroutines.delay
 
 
@@ -88,12 +75,14 @@ fun NewsFeedScreen(
                         FeedItem(news,
                             onClikToAuthor = { navController.navigateToProfile(post.author.id) },
                             onClikToBody = { navController.navigateToItemDetails(post.post.id) },
-                            onLike = { news = news.copy(liked = !news.liked) },
+                            onLike = {
+                                news = news.copy(liked = !news.liked)
+                                ListVM.liked(post)
+                            },
                             onClikComment = {},
                             onClikShare = {},
-                            onClikDelete = {
-                                ListVM.deletePost(post.post.id)
-                            })
+                            onClikDelete = { ListVM.deletePost(post.post.id) },
+                            onClickToPhoto = {})
                     }
                 }
             }
@@ -114,111 +103,6 @@ fun NewsFeedScreen(
 }
 
 
-@Composable
-fun NewsCard(
-    wellnessTask: PostWithAuthor,
-    liked: () -> Unit,
-    bodycheked: () -> Unit,
-    view: (wellnessTask: Post) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 5.dp)
-            .clip(MaterialTheme.shapes.medium)
-            .clickable { view(wellnessTask.post) },
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp, start = 10.dp),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            AsyncImage(
-                model = if (!wellnessTask.author.avatarUrl.isNullOrEmpty()) wellnessTask.author.avatarUrl else R.drawable.ic_launcher_background,
-                contentDescription = null,
-                modifier = Modifier
-                    .clip(shape = CircleShape)
-                    .size(54.dp),
-                contentScale = ContentScale.Crop,
-            )
-            Column(
-                modifier = Modifier.padding(start = 10.dp),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = wellnessTask.author.username.toString(),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight(600)
-                )
-
-                val time =
-                    wellnessTask.post.time.dayOfMonth.toString() + " " + wellnessTask.post.time.month.toString() + "    " + wellnessTask.post.time.hour.toString() + ":" + wellnessTask.post.time.minute
-                Text(
-                    text = time,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight(300),
-                    color = Color.Gray
-                )
-            }
-        }
-        Text(text = wellnessTask.post.descr,
-            maxLines = 3,
-            modifier = Modifier
-                .padding(start = 7.dp, end = 7.dp, top = 5.dp)
-                .clickable { bodycheked() })
-        AsyncImage(
-            model = wellnessTask.post.fileUrl,
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 5.dp)
-        )
-
-        Row(
-            modifier = Modifier
-                .padding(7.dp)
-                .height(35.dp)
-        ) {
-            LikeButton(wellnessTask) {
-                liked()
-            }
-            Row(
-                modifier = Modifier
-                    .padding(start = 23.dp)
-                    .size(35.dp)
-                    .clip(CircleShape)
-                    .clickable { },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_comment),
-                    contentDescription = "comment",
-                    modifier = Modifier.size(30.dp)
-                )
-                Text(
-                    text = if (wellnessTask.post.commentcount > 0) wellnessTask.post.commentcount.toString() else "",
-                    modifier = Modifier.padding(start = 2.dp)
-                )
-            }
-
-            Image(
-                painter = painterResource(id = R.drawable.ic_rep),
-                contentDescription = "rep",
-                modifier = Modifier
-                    .padding(start = 23.dp)
-                    .size(30.dp)
-                    .clip(CircleShape)
-                    .clickable { }
-
-            )
-
-
-        }
-    }
-
-}
 
 
 @Preview

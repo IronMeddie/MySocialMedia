@@ -1,6 +1,9 @@
 package com.ironmeddie.data.domain.use_case.feature_notification_screen
 
 
+import com.ironmeddie.data.domain.models.MyNotification.Companion.EVENT_FRIEND_REQUEST
+import com.ironmeddie.data.domain.models.MyNotification.Companion.EVENT_NEW_COMMENT
+import com.ironmeddie.data.domain.models.MyNotification.Companion.EVENT_NEW_LIKE
 import com.ironmeddie.data.domain.repository.MyRepository
 import com.ironmeddie.data.domain.models.UserInfo
 import kotlinx.coroutines.flow.combine
@@ -19,8 +22,14 @@ class GetNotificationsUseCase @Inject constructor(private val repository: MyRepo
                       authorID = notification.authorID,
                       timeStamp = notification.timeStamp.toString(),
                       isViewed = notification.isViewed,
-                      information = userInfo.secondname + " " + userInfo.firstname + " хочет дружить",
-                      isFriend = friends.Friends.contains(notification.authorID)
+                      information = userInfo.secondname + " " + userInfo.firstname + when(notification.event){
+                           EVENT_FRIEND_REQUEST-> " подписался на вас"
+                           EVENT_NEW_LIKE ->" поставил лайк под вашей записью"
+                           EVENT_NEW_COMMENT ->" оставил комментарий"
+                          else -> {" что-то сделал"}
+                      },
+                      isFriend = friends.Friends.contains(notification.authorID),
+                      postId = notification.postId
                   )
               }.sortedByDescending { it.timeStamp }
           }
@@ -36,5 +45,6 @@ data class NotificationItem(
     val timeStamp: String = "",
     val isViewed: Boolean = false,
     val information: String = "",
-    val isFriend: Boolean = false
+    val isFriend: Boolean = false,
+    val postId : String = ""
 )

@@ -8,7 +8,8 @@ data class MyNotification(
     val authorID: String = "",
     val timeStamp: Date = Date(),
     val isViewed: Boolean = false,
-    val information: String = ""
+    val information: String = "",
+    val postId : String = ""
 ) {
     companion object {
         const val EVENT_FRIEND_REQUEST = "friendRequest"

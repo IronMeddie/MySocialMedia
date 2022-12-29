@@ -98,8 +98,7 @@ fun MainNavHost(views: ListVM = hiltViewModel()) {
                     LentaItemWatch(
                         newsID = backst.arguments?.getString(Const.ITEM_ID),
                         views,
-                        navController,
-                        liked = { views.liked(it) })
+                        navController,)
                 }
                 composable(photoViewerRoute + "?id={id}", arguments =  listOf(
                     navArgument(name = "id"){
