@@ -1,11 +1,10 @@
 package com.ironmeddie.registerscreen.sign_in
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ironmeddie.domain.usecases.InvalidLoginExeption
-import com.ironmeddie.domain.usecases.SignInUseCase
+import com.ironmeddie.data.domain.use_case.login_logout_use_case.InvalidLoginExeption
+import com.ironmeddie.data.domain.use_case.login_logout_use_case.SignInUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,11 +38,15 @@ class loginViewModel @Inject constructor(
     }
 
 
-    fun signIn(): Boolean{
+    fun signIn(onSignInSuccess : (String) -> Unit): Boolean{
         val email = login.value
         val passwords = password.value
         return try {
-            viewModelScope.launch { signInUseCAse.execute(email,passwords) }
+            viewModelScope.launch {
+                signInUseCAse.execute(email,passwords){
+                onSignInSuccess(it)
+            }
+            }
             true
         } catch (e : InvalidLoginExeption){
             false

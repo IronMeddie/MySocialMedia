@@ -17,13 +17,14 @@ const val RegistrationScreenRoute = "registration_screen_route"
 const val RegistrationPasswordScreenRoute = "password_signin_screen"
 
 fun NavController.navigateToLoginScreen(
-    navOptions: NavOptions? = NavOptions.Builder().setPopUpTo(this.graph.id, true,true).setLaunchSingleTop(true).build()
-){
+    navOptions: NavOptions? = NavOptions.Builder().setPopUpTo(this.graph.id, true, true)
+        .setLaunchSingleTop(true).build()
+) {
     this.navigate(loginMainHost, navOptions)
 }
 
 
-fun NavGraphBuilder.loginScreen(navController:NavController, onRegistrationComplete: ()-> Unit) {
+fun NavGraphBuilder.loginScreen(navController: NavController, onRegistrationComplete: () -> Unit) {
 
     navigation(
         startDestination = SignInScreenRoute,
@@ -34,22 +35,61 @@ fun NavGraphBuilder.loginScreen(navController:NavController, onRegistrationCompl
             val viewModel: loginViewModel = hiltViewModel()
             SignInScreen(viewModel, navController)
         }
-        composable(SignInPasswordScreenRoute + "?email={email}", arguments =  listOf(
-            navArgument(name = "email"){
-                type = NavType.StringType
-                defaultValue = ""
-            })) {
+        composable(
+            SignInPasswordScreenRoute + "?email={email}", arguments = listOf(
+                navArgument(name = "email") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                })
+        ) {
             val viewModel: loginViewModel = hiltViewModel()
-            PasswordSignInScreen(viewModel){
+            PasswordSignInScreen(viewModel) {
                 onRegistrationComplete()
             }
         }
         composable(route = RegistrationScreenRoute) {
             RegistrationScreen() {
-                navController.navigate(RegistrationPasswordScreenRoute)
+                navController.navigate(
+                    RegistrationPasswordScreenRoute +
+                            "?username=${it.username}" +
+                            "&firstname=${it.firstname}" +
+                            "&secondname=${it.secondname}" +
+                            "&age=${it.age}" +
+                            "&sex=${it.sex}" +
+                            "&email=${it.email}"
+                )
             }
         }
-        composable(route = RegistrationPasswordScreenRoute) {
+        composable(
+            route = RegistrationPasswordScreenRoute
+                    + "?username={username}&firstname={firstname}&secondname={secondname}&age={age}&sex={sex}&email={email}",
+            arguments = listOf(
+                navArgument(name = "username") {
+                    type = NavType.StringType
+                    defaultValue = "-1"
+                },
+                navArgument(name = "firstname") {
+                    type = NavType.StringType
+                    defaultValue = "-1"
+                },
+                navArgument(name = "secondname") {
+                    type = NavType.StringType
+                    defaultValue = "-1"
+                },
+                navArgument(name = "age") {
+                    type = NavType.StringType
+                    defaultValue = "-1"
+                },
+                navArgument(name = "sex") {
+                    type = NavType.StringType
+                    defaultValue = "-1"
+                },
+                navArgument(name = "email") {
+                    type = NavType.StringType
+                    defaultValue = "-1"
+                },
+            )
+        ) {
             PasswordRegistrationScreen() {
                 onRegistrationComplete()
             }

@@ -3,6 +3,7 @@ package com.ironmeddie.registerscreen.registration.registration_main_info
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ironmeddie.data.data.repository.MyRepositoryImpl
@@ -13,9 +14,8 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class RegistrationScreenViewModel @Inject constructor(
-    private val repository: MyRepositoryImpl
-    ) : ViewModel() {
+class RegistrationScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+
     var username by mutableStateOf("")
         private set
     var firstName by mutableStateOf("")
@@ -28,7 +28,6 @@ class RegistrationScreenViewModel @Inject constructor(
         private set
     var sex by mutableStateOf("")
         private set
-
 
     fun setUserName(str: String) {
         username = str
@@ -49,13 +48,6 @@ class RegistrationScreenViewModel @Inject constructor(
     }
     fun setSe(str: String) {
         sex = str
-    }
-
-
-    fun saveUserInfo(){
-        viewModelScope.launch {
-            repository.saveUser(createUser())
-        }
     }
 
 

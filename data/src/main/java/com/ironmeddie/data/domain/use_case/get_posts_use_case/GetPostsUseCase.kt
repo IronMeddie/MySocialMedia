@@ -8,12 +8,14 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+
+
 class GetPostsUseCase @Inject constructor(private val repository: MyRepository) {
 
 
     operator fun invoke(option: PostOption = PostOption.Feed) = if (option is PostOption.Feed) {
         repository.getUserFriendList().flatMapLatest {
-            val list = mutableListOf(repository.getUserId().toString())
+            val list = mutableListOf(repository.getUserId() ?: repository.getUser().id)
             list.addAll(it.Friends)
             repository.getPosts(list).map { posts ->
                 posts.sortedByDescending { it.time }.map { post ->

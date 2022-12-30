@@ -8,7 +8,8 @@ import javax.inject.Inject
 class GetProfileInfoUseCase @Inject constructor(private val repository: MyRepository) {
     operator fun invoke(id: String? = null) = flow {
         if (id.isNullOrEmpty()) {
-            val info = repository.getUserInformation(repository.getUserId() ?: return@flow) ?: UserInfo()
+            val user = repository.getUser()
+            val info = repository.getUserInformation(user.id) ?: user
             emit(info)
         } else {
             val info = repository.getUserInformation(id) ?: UserInfo()

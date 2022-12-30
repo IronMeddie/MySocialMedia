@@ -28,10 +28,6 @@ class ListVM @Inject constructor(
 
     private var job: Job? = null
 
-    init {
-        getNews()
-    }
-
     fun liked(item: PostWithAuthor) {
         viewModelScope.launch {
             likeUseCase(item)
@@ -46,6 +42,7 @@ class ListVM @Inject constructor(
                 _tasks.value = DataState.Success(it)
             }.launchIn(viewModelScope)
         }catch (e : Exception){
+            _tasks.value = DataState.Error(e.localizedMessage ?: e.message ?: "error")
             e.localizedMessage?.let { Log.d("checkCode", it) }
         }
 

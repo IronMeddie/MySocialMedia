@@ -6,11 +6,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.ironmeddie.data.domain.utils.DataState
 import com.ironmeddie.feature_feed.feed_item.FeedItem
 import com.stogramm.composetest3.ui.screens.ItemDetails.navigateToItemDetails
 import com.stogramm.composetest3.ui.screens.login.navigateToLoginScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun Profile(navController: NavController, viewModel: ProfileViewModel = hiltViewModel()) {
@@ -36,7 +38,9 @@ fun Profile(navController: NavController, viewModel: ProfileViewModel = hiltView
                     post = news,
                     onClikToAuthor = { /*TODO*/ },
                     onClikToBody = { navController.navigateToItemDetails(post.post.id) },
-                    onLike = { news = news.copy(liked = !news.liked) /*TODO*/ },
+                    onLike = {
+                        news = news.copy(liked = !news.liked)
+                        viewModel.like(post)},
                     onClikComment = { /*TODO*/ },
                     onClikDelete = {viewModel.deletePosto(post.post.id)},
                     onClikShare = {/*TODO*/},

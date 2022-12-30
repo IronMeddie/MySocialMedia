@@ -13,6 +13,8 @@ import com.ironmeddie.data.domain.repository.MyRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,7 +31,7 @@ class MyRepositoryImpl @Inject constructor(
 
     override suspend fun saveUser(user: UserInfo) = articleDao.insert(user)
 
-    override suspend fun deleteUserFromLocal(user: UserInfo) = articleDao.delete(user)
+    override suspend fun deleteUserFromLocal() = articleDao.delete()
 
     override suspend fun signIn(email: String, password: String) = firebaseAuthApp.signIn(email = email, password = password)
 
@@ -37,18 +39,17 @@ class MyRepositoryImpl @Inject constructor(
         firebaseAuthApp.signOut()
     }
 
-    override suspend fun registration(user: UserInfo, password: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val id = firebaseAuthApp.registerNew(
-                email = user.email ?: return@launch,
-                password = password
-            )
-            if (id != null) {
-                userid = id
-                val newUser = user.copy(id = id)
-                firestore.addNewUser(newUser)
-            }
+    override suspend fun registration(user: UserInfo, password: String): String? {
+        val id = firebaseAuthApp.registerNew(
+            email = user.email ?: return null,
+            password = password
+        )
+        if (id != null) {
+            userid = id
+            val newUser = user.copy(id = id)
+            firestore.addNewUser(newUser)
         }
+        return id
     }
 
     override suspend fun newPost(fileUri: Uri, description: String) {
@@ -62,7 +63,18 @@ class MyRepositoryImpl @Inject constructor(
 
     override fun getUserId() = Firebase.auth.currentUser?.uid
 
-    override fun getUserFriendList(id: String?): Flow<Friends> = firestore.getFriendsList(id)
+    override fun getUserFriendList(id: String?): Flow<Friends> {
+        val idFlow = flow {
+            val userId = if (id.isNullOrEmpty()) {
+                getUser().id
+            } else id
+            emit(userId)
+        }
+        return idFlow.flatMapLatest {
+            firestore.getFriendsList(it)
+        }
+    }
+
 
     override fun getNotifications(): Flow<List<MyNotification>> = firestore.getNotifications()
 

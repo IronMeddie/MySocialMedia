@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -20,11 +21,31 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.ironmeddie.data.domain.models.UserInfo
 import com.ironmeddie.registerscreen.R
 
 
 @Composable
-fun RegistrationScreen(viewModel : RegistrationScreenViewModel = hiltViewModel(), onNavigatetoPassword : () -> Unit){
+fun RegistrationScreen(viewModel : RegistrationScreenViewModel = hiltViewModel(), onNavigatetoPassword : (user: UserInfo) -> Unit){
+
+//    navController.navigate(Screen.AddNoteScreen.route + "?noteId=${note.id}&noteColor=${note.color}")
+
+
+//    composable(route = Screen.AddNoteScreen.route + "?noteId={noteId}&noteColor={noteColor}", arguments =  listOf(
+//        navArgument(name = "noteId"){
+//            type = NavType.IntType
+//            defaultValue = -1
+//        },
+//        navArgument(name = "noteColor"){
+//            type = NavType.IntType
+//            defaultValue = -1
+//        }
+//    )){ val color = it.arguments?.getInt("noteColor") ?: -1 Screen(color) }
+
+
 
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = stringResource(R.string.username))
@@ -183,8 +204,7 @@ fun RegistrationScreen(viewModel : RegistrationScreenViewModel = hiltViewModel()
             .padding(16.dp)
             .background(MaterialTheme.colors.secondary)
             .clickable {
-                viewModel.saveUserInfo()
-                       onNavigatetoPassword()
+                       onNavigatetoPassword(viewModel.createUser())
             }, contentAlignment = Alignment.Center) {
             Text(text = stringResource(R.string.next), fontSize = 22.sp)
         }

@@ -20,9 +20,8 @@ class FirebaseStorageApp {
     }
 
     suspend fun deletePostMedia(id: String){
-        storageRef.child(FileType.PostMedia.node).child(id).delete()
+        storageRef.child(FileType.PostMedia.node).child(id).delete().await()
     }
-
 
     sealed class FileType(val node: String) {
         object PostMedia : FileType("PostsMedia")

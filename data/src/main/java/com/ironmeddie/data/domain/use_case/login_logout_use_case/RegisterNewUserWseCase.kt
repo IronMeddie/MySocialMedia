@@ -1,7 +1,6 @@
-package com.ironmeddie.domain.usecases
+package com.ironmeddie.data.domain.use_case.login_logout_use_case
 
 import androidx.core.text.isDigitsOnly
-import com.ironmeddie.data.data.repository.MyRepositoryImpl
 import com.ironmeddie.data.domain.repository.MyRepository
 import com.ironmeddie.data.domain.models.UserInfo
 import javax.inject.Inject
@@ -13,7 +12,7 @@ class RegisterNewUserUseCase @Inject constructor(
 
 
     @Throws(InvalidUserExeption::class)
-    suspend fun execute(user: UserInfo, password: String) {
+    suspend operator fun invoke(user: UserInfo, password: String, onRegistrationSuccess : (id : String) -> Unit): String? {
         if (password.isBlank() || password.length < 6) {
             throw InvalidUserExeption("Wrong password! min size = 6")
         }
@@ -29,7 +28,10 @@ class RegisterNewUserUseCase @Inject constructor(
         if (user.age.isNullOrBlank() || user.age?.isDigitsOnly() == false) {
             throw InvalidUserExeption("age can't be empty it must be number")
         }
-        repository.registration(user = user, password = password)
+        val id = repository.registration(user = user, password = password)
+        repository.saveUser(user.copy(id ?: "0"))
+        if (!id.isNullOrEmpty()) onRegistrationSuccess(id)
+        return id
     }
 }
 

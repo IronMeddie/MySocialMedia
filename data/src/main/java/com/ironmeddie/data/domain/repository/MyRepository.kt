@@ -13,13 +13,13 @@ interface MyRepository {
 
     suspend fun saveUser(user: UserInfo)
 
-    suspend fun deleteUserFromLocal(user: UserInfo)
+    suspend fun deleteUserFromLocal()
 
     suspend fun signIn(email: String, password: String): String?
 
     fun logOut()
 
-    suspend fun registration(user: UserInfo, password: String)
+    suspend fun registration(user: UserInfo, password: String): String?
 
     suspend fun newPost(fileUri: Uri, description: String)
 
@@ -50,5 +50,6 @@ interface MyRepository {
     suspend fun deletePost(id: String)
 
     suspend fun removeLike(id: String)
+
 
 }

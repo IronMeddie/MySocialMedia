@@ -6,5 +6,11 @@ import kotlinx.coroutines.flow.catch
 import javax.inject.Inject
 
 class GetUserFriendsUseCase @Inject constructor(private val repository: MyRepository) {
-    operator fun invoke(id: String? = null) = repository.getUserFriendList(id).catch { Log.d("checkCode", it.message.toString()) }
+    operator fun invoke(id: String? = null) = repository.getUserFriendList(id)
+        .catch { Log.d("checkCode", it.message.toString()) }
+
+
+
+
+
 }

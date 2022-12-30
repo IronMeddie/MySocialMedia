@@ -77,11 +77,11 @@ fun HeaderProfile(state: ProfileState, onAvatarChange : (uri: Uri) -> Unit) {
         )
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = state.friends.Friends.size.toString(), fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Text(text = "Подписчики", color = TextGrey, fontSize = 12.sp)
+            Text(text = "Подписан", color = TextGrey, fontSize = 12.sp)
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = (state.friends.Query.size + state.friends.Friends.size).toString(), fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Text(text = "Подписан", color = TextGrey, fontSize = 12.sp)
+            Text(text = "Подписчики", color = TextGrey, fontSize = 12.sp)
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = state.posts.size.toString(), fontWeight = FontWeight.Bold, fontSize = 18.sp)
@@ -94,6 +94,7 @@ fun HeaderProfile(state: ProfileState, onAvatarChange : (uri: Uri) -> Unit) {
 fun ProfileDescription(state: ProfileState) {
     Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
         Text(text = "Заголовок", fontWeight = FontWeight.Bold, maxLines = 2)
+
         Text(text = "- Описание" + "\n" + "- Дарим радость и улыбки" + "\n" + "- Оригинальный подарок" + "\n" + "yandex.ru")
     }
 }

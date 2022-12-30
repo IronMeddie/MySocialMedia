@@ -176,10 +176,8 @@ class MyFireStore {
     }
 
 
-    @Throws(NoAuthExeption::class)
-    fun getFriendsList(id: String? = null): Flow<Friends> {
-        val currentUser = if (id?.isNotBlank() == true) id else Firebase.auth.currentUser?.uid
-            ?: throw NoAuthExeption("getNotifications failure")
+    fun getFriendsList(id: String): Flow<Friends> {
+        val currentUser = id
         return flow {
             val list = db.collection(FRIENDS_NODE).document(currentUser).get().await()
                 .toObject(Friends::class.java)

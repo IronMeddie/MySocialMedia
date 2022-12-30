@@ -1,6 +1,7 @@
 package com.stogramm.composetest3.ui.screens.userprofile
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,10 +11,11 @@ import com.ironmeddie.data.domain.models.UserInfo
 import com.ironmeddie.data.domain.use_case.delete_post.DeletePostUseCase
 import com.ironmeddie.data.domain.use_case.get_posts_use_case.GetPostsUseCase
 import com.ironmeddie.data.domain.utils.DataState
-import com.ironmeddie.domain.usecases.LogOutUseCase
+import com.ironmeddie.data.domain.use_case.login_logout_use_case.LogOutUseCase
 import com.ironmeddie.data.domain.use_case.get_profile_use_case.GetProfileInfoUseCase
 import com.ironmeddie.data.domain.use_case.get_profile_use_case.GetUserFriendsUseCase
 import com.ironmeddie.data.domain.use_case.get_profile_use_case.UpdateAvatarUseCase
+import com.ironmeddie.data.domain.use_case.like_use_case.LikeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,19 +33,10 @@ class ProfileViewModel @Inject constructor(
     private val updateAvatarUseCase: UpdateAvatarUseCase,
     private val deletePostUseCase: DeletePostUseCase,
     private val getFriends: GetUserFriendsUseCase,
-
+    private val likeUseCase: LikeUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-//
-//    private val _posts = MutableStateFlow<DataState<List<PostWithAuthor>>>(DataState.Loading)
-//    val posts = _posts.asStateFlow()
-//
-//    private val _user = MutableStateFlow<DataState<UserInfo>>(DataState.Loading)
-//    val user = _user.asStateFlow()
-//
-//    private val _friends = MutableStateFlow<DataState<Friends>>(DataState.Loading)
-//    val friends = _friends.asStateFlow()
 
     private val _state = MutableStateFlow<DataState<ProfileState>>(DataState.Loading)
     val state = _state.asStateFlow()
@@ -64,7 +57,6 @@ class ProfileViewModel @Inject constructor(
     fun loadPosts() {
         job?.cancel()
         job = getPosts(GetPostsUseCase.PostOption.UserPosts(profileId)).onEach {
-//            _posts.value = DataState.Success(it)
             profile = profile.copy(posts = it)
             _state.value = DataState.Success(profile)
         }.launchIn(viewModelScope)
@@ -72,7 +64,6 @@ class ProfileViewModel @Inject constructor(
 
     fun loadUserInfo() {
         getProfileInfoUseCase(profileId).onEach {
-//            _user.value = DataState.Success(it)
             profile = profile.copy(user = it)
             _state.value = DataState.Success(profile)
         }.launchIn(viewModelScope)
@@ -91,8 +82,8 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun loadFriends(){
+        Log.d("checkCode", profileId.toString())
         getFriends(profileId).onEach {
-//            _friends.value = DataState.Success(it)
             profile = profile.copy(friends = it)
             _state.value = DataState.Success(profile)
         }.launchIn(viewModelScope)
@@ -102,6 +93,13 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             deletePostUseCase(id)
         }
+    }
+
+    fun like(item: PostWithAuthor) {
+        viewModelScope.launch {
+            likeUseCase(item)
+        }
+        loadPosts()
     }
 
 }

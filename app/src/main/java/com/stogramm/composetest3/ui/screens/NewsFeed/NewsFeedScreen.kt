@@ -30,17 +30,18 @@ fun NewsFeedScreen(
     viewModel: ListVM = hiltViewModel(),
     navController: NavController,
 ) {
-    val state = viewModel.tasks.collectAsState().value
-    LaunchedEffect(key1 = true) {
-        delay(200)
+    LaunchedEffect(key1 = true ){
         viewModel.getNews()
     }
+    val state = viewModel.tasks.collectAsState().value
     when (state) {
         is DataState.Success -> {
             Scaffold(
                 topBar = {
                     Row(
-                        Modifier.fillMaxWidth().shadow(12.dp)
+                        Modifier
+                            .fillMaxWidth()
+                            .shadow(12.dp)
                             .background(MaterialTheme.colors.background),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically

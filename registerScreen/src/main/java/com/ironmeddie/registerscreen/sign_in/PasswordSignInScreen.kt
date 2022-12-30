@@ -21,9 +21,15 @@ import com.ironmeddie.registerscreen.registration.registration_password.Password
 
 
 @Composable
-fun PasswordSignInScreen(viewModel : loginViewModel = hiltViewModel(), onNavigateToMainScreen: () -> Unit) {
+fun PasswordSignInScreen(
+    viewModel: loginViewModel = hiltViewModel(),
+    onNavigateToMainScreen: (String) -> Unit
+) {
     val login = viewModel.login.collectAsState().value
     val password = viewModel.password.collectAsState().value
+    var isLoading by remember{ mutableStateOf(false) }
+
+    if (isLoading) CircularProgressIndicator()
 
     Scaffold() {
         Column(
@@ -63,8 +69,11 @@ fun PasswordSignInScreen(viewModel : loginViewModel = hiltViewModel(), onNavigat
                     )
                     Button(
                         onClick = {
-                                 val resp = viewModel.signIn()
-                            if (resp) onNavigateToMainScreen()
+                            isLoading = true
+                            viewModel.signIn() {
+                                isLoading = false
+                                onNavigateToMainScreen(it)
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -88,8 +97,8 @@ fun PasswordSignInScreen(viewModel : loginViewModel = hiltViewModel(), onNavigat
 @Preview(showBackground = true)
 @Composable
 fun prewipassword() {
-val viewModel: loginViewModel = hiltViewModel()
-    PasswordSignInScreen(viewModel){
+    val viewModel: loginViewModel = hiltViewModel()
+    PasswordSignInScreen(viewModel) {
 
     }
 }

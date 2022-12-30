@@ -15,6 +15,5 @@ data class UserInfo(
     val email: String? = "",
     val sex: String? = "",
     val avatarUrl : String?= "",
+    val about : String = ""
 ) : Serializable
-
-val friendsList : List<String> = listOf("")
