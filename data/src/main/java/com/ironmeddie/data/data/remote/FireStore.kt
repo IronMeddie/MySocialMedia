@@ -61,6 +61,21 @@ class MyFireStore {
         ).await().id
     }
 
+    @Throws(NoAuthExeption::class)
+     fun newPostFlow(description: String)= flow {
+        val currentUser = Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("newPost failure")
+        val postId = db.collection(POSTS_NODE).add(
+            hashMapOf(
+                PostNodes.descr to description,
+                PostNodes.timeStamp to FieldValue.serverTimestamp(),
+                PostNodes.author to currentUser
+            )
+        ).await().id
+         emit(postId)
+    }
+
+
+
 
     fun getPosts(authorsId: List<String>) = flow {
         val currentUser = Firebase.auth.currentUser?.uid ?: throw NoAuthExeption("newPost failure")
@@ -76,6 +91,10 @@ class MyFireStore {
     suspend fun updatePostLink(url: String, postId: String) {
         db.collection(POSTS_NODE).document(postId).update(PostNodes.fileUrl, url).await()
     }
+
+//     fun updatePostLinkFlow(url: String, postId: String) = flow<String> {
+//        db.collection(POSTS_NODE).document(postId).update(PostNodes.fileUrl, url).await()
+//    }
 
     @Throws(NoAuthExeption::class)
     suspend fun updateUserInformation(information: UserInformationUpdate) {

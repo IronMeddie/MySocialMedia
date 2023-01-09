@@ -2,6 +2,7 @@ package com.ironmeddie.data.data.repository
 
 import android.net.Uri
 import android.util.Log
+import androidx.core.text.isDigitsOnly
 import com.example.test1.data.db.UserDao
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -12,9 +13,7 @@ import com.ironmeddie.data.domain.models.UserInfo
 import com.ironmeddie.data.domain.repository.MyRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,7 +32,8 @@ class MyRepositoryImpl @Inject constructor(
 
     override suspend fun deleteUserFromLocal() = articleDao.delete()
 
-    override suspend fun signIn(email: String, password: String) = firebaseAuthApp.signIn(email = email, password = password)
+    override suspend fun signIn(email: String, password: String) =
+        firebaseAuthApp.signIn(email = email, password = password)
 
     override fun logOut() {
         firebaseAuthApp.signOut()
@@ -55,7 +55,8 @@ class MyRepositoryImpl @Inject constructor(
     override suspend fun newPost(fileUri: Uri, description: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val postId = firestore.newPost(description)
-            val url = storage.setFileToStorage(fileUri, FirebaseStorageApp.FileType.PostMedia, postId)
+            val url =
+                storage.setFileToStorage(fileUri, FirebaseStorageApp.FileType.PostMedia, postId)
             Log.d("checkCode", "here")
             firestore.updatePostLink(url, postId)
         }
@@ -103,7 +104,7 @@ class MyRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun like(postId: String, postAuthor:String) {
+    override suspend fun like(postId: String, postAuthor: String) {
         firestore.like(postId, postAuthor)
     }
 
@@ -115,4 +116,18 @@ class MyRepositoryImpl @Inject constructor(
     }
 
     override suspend fun removeLike(id: String) = firestore.removeLike(id)
+
+
+//    override fun newPostFlow(
+//        fileUri: Uri, description: String
+//    ): Flow<String> = firestore.newPostFlow(description).flatMapLatest { postId ->
+//        storage.setFileToStorageFlow(
+//            uri = fileUri,
+//            postId = postId,
+//            fileType = FirebaseStorageApp.FileType.PostMedia
+//        ).onEach { url->
+//            if (!url.isDigitsOnly()) firestore.updatePostLinkFlow(url,postId)
+//        }
+//    }
+
 }
