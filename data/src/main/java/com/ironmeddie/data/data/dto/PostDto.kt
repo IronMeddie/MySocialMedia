@@ -20,7 +20,7 @@ data class PostDto(
             author = this.author,
             descr = this.descr,
             fileUrl = this.fileUrl,
-            time = Instant.ofEpochSecond(this.timeStamp.seconds, this.timeStamp.nanoseconds.toLong() ).atZone(
+            time = Instant.ofEpochSecond(this.timeStamp.seconds , this.timeStamp.nanoseconds.toLong() ).atZone(
                 ZoneId.systemDefault()).toLocalDateTime(),
             likes = this.likes
 

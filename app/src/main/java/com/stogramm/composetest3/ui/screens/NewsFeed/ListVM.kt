@@ -28,6 +28,9 @@ class ListVM @Inject constructor(
 
     private var job: Job? = null
 
+    init {
+        getNews()
+    }
     fun liked(item: PostWithAuthor) {
         viewModelScope.launch {
             likeUseCase(item)

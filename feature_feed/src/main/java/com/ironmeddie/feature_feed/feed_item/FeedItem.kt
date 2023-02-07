@@ -1,6 +1,7 @@
 package com.ironmeddie.feature_feed.feed_item
 
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,10 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.ironmeddie.data.domain.models.Post
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
 import com.ironmeddie.data.domain.models.PostWithAuthor
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -34,8 +38,11 @@ fun FeedItem(
     onClikShare: () -> Unit,
     onClikDelete: () -> Unit,
     onClickToPhoto: () -> Unit,
-    isDetailsScreen: Boolean = false
+    isDetailsScreen: Boolean = false,
 ) {
+
+
+
     Column(modifier = Modifier.clickable { onClikToBody() }) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -64,8 +71,8 @@ fun FeedItem(
                 )
 
             }
-            // todo проверить на авторство пост дабы функция удаления была только у автора
-            if (post.post.isAuthor){
+
+            if (post.post.isAuthor) {
                 var expanded by remember { mutableStateOf(false) }
                 IconButton(
                     onClick = { expanded = !expanded },
@@ -84,18 +91,31 @@ fun FeedItem(
             }
         }
 
-        AsyncImage(
-            model = post.post.fileUrl,
-            contentDescription = "main content photo",
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
+        val model = ImageRequest.Builder(LocalContext.current)
+            .data(post.post.fileUrl)
+            .size(Size.ORIGINAL)
+            .crossfade(true) .build()
+        val painter = rememberAsyncImagePainter(model)
+        Image( modifier = Modifier.fillMaxWidth().defaultMinSize(100.dp).clickable {
                     if (isDetailsScreen)
                         onClickToPhoto()
                     else onClikToBody()
                 },
-            contentScale = ContentScale.FillWidth
-        ) // content
+            painter = painter, contentDescription = "main content photo", contentScale = ContentScale.FillWidth )
+
+
+//        AsyncImage(
+//            model = post.post.fileUrl,
+//            contentDescription = "main content photo",
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .clickable {
+//                    if (isDetailsScreen)
+//                        onClickToPhoto()
+//                    else onClikToBody()
+//                },
+//            contentScale = ContentScale.FillWidth
+//        ) // content
         Text(
             text = post.post.descr,
             style = MaterialTheme.typography.body1,
@@ -130,7 +150,11 @@ fun FeedItem(
             IconButton(onClick = {
                 onLike()
             }) {
-                Icon(imageVector = image, contentDescription = "post like", tint = if (!post.liked) initialColor else targetcolor)
+                Icon(
+                    imageVector = image,
+                    contentDescription = "post like",
+                    tint = if (!post.liked) initialColor else targetcolor
+                )
             }
             if (!isDetailsScreen) IconButton(onClick = onClikComment) {
                 Icon(
@@ -159,19 +183,5 @@ fun LocalDateTime.toMyStringFormat(): String {
 }
 
 
-@Composable
-@Preview(showBackground = true)
-fun PreviewFeedItem() {
-    val post =
-        PostWithAuthor(post = Post(fileUrl = "https://sun9-86.userapi.com/impg/YtJno0HvVLL5oVtkTkiAAvPWlBXZ_rDCyvNlkg/DsqaxiCtHMQ.jpg?size=967x2160&quality=95&sign=bea27644ea749d10069d674c55d29881&type=album"))
-//    FeedItem(
-//        post,
-//        onClikToAuthor = {},
-//        onClikToBody = {},
-//        onLike = {},
-//        onClikComment = {},
-//        onClikShare = {})
-
-}
 
 

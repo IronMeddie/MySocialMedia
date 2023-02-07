@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="11" />
+    <bytecodeTargetLevel target="1.7">
+      <module name="composetest3.app" target="11" />
+      <module name="composetest3.common" target="11" />
+      <module name="composetest3.data" target="11" />
+      <module name="composetest3.feature_add_friend" target="11" />
+      <module name="composetest3.feature_feed" target="11" />
+      <module name="composetest3.feature_new_post" target="11" />
+      <module name="composetest3.feature_notifications" target="11" />
+      <module name="composetest3.gridComposable" target="11" />
+      <module name="composetest3.registerScreen" target="11" />
+    </bytecodeTargetLevel>
   </component>
 </project>

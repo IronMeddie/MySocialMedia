@@ -53,13 +53,11 @@ class MyRepositoryImpl @Inject constructor(
     }
 
     override suspend fun newPost(fileUri: Uri, description: String) {
-        CoroutineScope(Dispatchers.IO).launch {
             val postId = firestore.newPost(description)
-            val url =
-                storage.setFileToStorage(fileUri, FirebaseStorageApp.FileType.PostMedia, postId)
-            Log.d("checkCode", "here")
+            val url = storage.setFileToStorage(fileUri, FirebaseStorageApp.FileType.PostMedia, postId)
             firestore.updatePostLink(url, postId)
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//        }
     }
 
     override fun getUserId() = Firebase.auth.currentUser?.uid

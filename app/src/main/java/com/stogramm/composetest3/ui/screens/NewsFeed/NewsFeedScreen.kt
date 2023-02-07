@@ -22,7 +22,6 @@ import com.ironmeddie.feature_feed.feed_item.FeedItem
 import com.ironmeddie.feature_new_post.presentation.navigation.navigateToNewPostScreen
 import com.stogramm.composetest3.ui.screens.ItemDetails.navigateToItemDetails
 import com.stogramm.composetest3.ui.screens.userprofile.navigateToProfile
-import kotlinx.coroutines.delay
 
 
 @Composable
@@ -30,12 +29,15 @@ fun NewsFeedScreen(
     viewModel: ListVM = hiltViewModel(),
     navController: NavController,
 ) {
-    LaunchedEffect(key1 = true ){
-        viewModel.getNews()
-    }
+
+//    LaunchedEffect(key1 = true) {
+//        viewModel.getNews()
+//    }
     val state = viewModel.tasks.collectAsState().value
+
     when (state) {
         is DataState.Success -> {
+
             Scaffold(
                 topBar = {
                     Row(
@@ -73,8 +75,11 @@ fun NewsFeedScreen(
                 ) {
 
                     items(state.data, key = { it.post.id }) { post ->
+
+
                         var news by remember { mutableStateOf(post) }
-                        FeedItem(news,
+                        FeedItem(
+                            news,
                             onClikToAuthor = { navController.navigateToProfile(post.author.id) },
                             onClikToBody = { navController.navigateToItemDetails(post.post.id) },
                             onLike = {
@@ -84,7 +89,8 @@ fun NewsFeedScreen(
                             onClikComment = {},
                             onClikShare = {},
                             onClikDelete = { viewModel.deletePost(post.post.id) },
-                            onClickToPhoto = {})
+                            onClickToPhoto = {},
+                        )
                     }
                 }
             }
@@ -103,8 +109,6 @@ fun NewsFeedScreen(
 
 
 }
-
-
 
 
 @Preview
