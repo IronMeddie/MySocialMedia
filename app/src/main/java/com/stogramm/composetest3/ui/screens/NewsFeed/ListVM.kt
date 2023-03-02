@@ -11,6 +11,7 @@ import com.ironmeddie.data.domain.utils.DataState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -28,6 +29,9 @@ class ListVM @Inject constructor(
 
     private var job: Job? = null
 
+    private val _loading = MutableStateFlow(false)
+    val loading = _loading.asStateFlow()
+
     init {
         getNews()
     }
@@ -41,10 +45,13 @@ class ListVM @Inject constructor(
     fun getNews() {
         try {
             job?.cancel()
+            _loading.value = true
             job = getPosts().onEach {
                 _tasks.value = DataState.Success(it)
+                _loading.value = false
             }.launchIn(viewModelScope)
         }catch (e : Exception){
+            _loading.value = false
             _tasks.value = DataState.Error(e.localizedMessage ?: e.message ?: "error")
             e.localizedMessage?.let { Log.d("checkCode", it) }
         }

@@ -70,7 +70,7 @@ fun MainNavHost(checkAuthViewModel: CheckAuthViewModel = hiltViewModel()) {
                             .setPopUpTo(navController.graph.id, true).build()
                     )
                 })
-            composable(ItemViewerScreenRoute + "/{${Const.ITEM_ID}}") {
+            composable(ItemViewerScreenRoute  ) {
                 LentaItemWatch(navController)
             }
             composable(

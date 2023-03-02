@@ -8,6 +8,9 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,87 +27,94 @@ import com.stogramm.composetest3.ui.screens.ItemDetails.navigateToItemDetails
 import com.stogramm.composetest3.ui.screens.userprofile.navigateToProfile
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NewsFeedScreen(
     viewModel: ListVM = hiltViewModel(),
     navController: NavController,
 ) {
 
-//    LaunchedEffect(key1 = true) {
-//        viewModel.getNews()
-//    }
+
     val state = viewModel.tasks.collectAsState().value
-
-    when (state) {
-        is DataState.Success -> {
-
-            Scaffold(
-                topBar = {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .shadow(12.dp)
-                            .background(MaterialTheme.colors.background),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Stogramm",
-                            style = MaterialTheme.typography.h6,
-                            modifier = Modifier.padding(start = 16.dp)
+    val refreshing = viewModel.loading.collectAsState().value
+    val refresgState = rememberPullRefreshState(refreshing, viewModel::getNews)
+    Scaffold(
+        topBar = {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .shadow(12.dp)
+                    .background(MaterialTheme.colors.background),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Stogramm",
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+                Row(modifier = Modifier.padding(end = 16.dp)) {
+                    IconButton(onClick = { navController.navigateToNewPostScreen() }) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "new post"
                         )
-                        Row(modifier = Modifier.padding(end = 16.dp)) {
-                            IconButton(onClick = { navController.navigateToNewPostScreen() }) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "new post"
-                                )
-                            }
-                            IconButton(onClick = { navController.navigateToSearchScreen() }) {
-                                Icon(
-                                    imageVector = Icons.Default.Search,
-                                    contentDescription = "search"
-                                )
-                            }
-                        }
                     }
-
-                }) { paddingValues ->
-                LazyColumn(
-                    modifier = Modifier.padding(paddingValues)
-                ) {
-
-                    items(state.data, key = { it.post.id }) { post ->
-
-
-                        var news by remember { mutableStateOf(post) }
-                        FeedItem(
-                            news,
-                            onClikToAuthor = { navController.navigateToProfile(post.author.id) },
-                            onClikToBody = { navController.navigateToItemDetails(post.post.id) },
-                            onLike = {
-                                news = news.copy(liked = !news.liked)
-                                viewModel.liked(post)
-                            },
-                            onClikComment = {},
-                            onClikShare = {},
-                            onClikDelete = { viewModel.deletePost(post.post.id) },
-                            onClickToPhoto = {},
+                    IconButton(onClick = { navController.navigateToSearchScreen() }) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "search"
                         )
                     }
                 }
             }
-        }
-        is DataState.Loading -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+
+        }) { paddingValues ->
+        Box(
+            Modifier
+                .pullRefresh(refresgState)
+                .fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                when (state) {
+                    is DataState.Success -> {
+                        items(state.data, key = { it.post.id }) { post ->
+                            var news by remember { mutableStateOf(post) }
+                            FeedItem(
+                                news,
+                                onClikToAuthor = { navController.navigateToProfile(post.author.id) },
+                                onClikToBody = { navController.navigateToItemDetails(post.post.id) },
+                                onLike = {
+                                    news = news.copy(liked = !news.liked)
+                                    viewModel.liked(post)
+                                },
+                                onClikComment = {},
+                                onClikShare = {},
+                                onClikDelete = { viewModel.deletePost(post.post.id) },
+                                onClickToPhoto = {},
+                            )
+                        }
+                    }
+                    is DataState.Loading -> {
+
+                    }
+                    is DataState.Error -> {
+                        // todo show snackbar with action retry
+                               item {
+                                   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                       Text(text = state.message)
+                                   }
+                               }
+                    }
+                }
+
             }
+            PullRefreshIndicator(refreshing, refresgState, Modifier.align(Alignment.TopCenter))
+
+
         }
-        is DataState.Error -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = state.message)
-            }
-        }
+
     }
 
 
